@@ -4,10 +4,9 @@
 *   https://github.com/raysan5/raylib/wiki/Working-on-GNU-Linux building using these steps for now
 *
 ********************************************************************************************/
-#pragma once
 #include <iostream>
-
-
+#include "ggponet.h"
+#include "platform_unix.h"
 #include "raylib.h"
 #include <math.h>
 
