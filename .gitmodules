@@ -1,0 +1,10 @@
+[submodule "lib/gca-plus"]
+	path = lib/gca-plus
+	url = https://github.com/IanBand/gca-plus.git
+[submodule "lib/raylib"]
+	path = lib/raylib
+	url = https://github.com/raysan5/raylib.git
+[submodule "lib/ggpo"]
+	path = lib/ggpo
+	url = https://github.com/Shugyousha/ggpo.git
+	branch = libsdlvw-rfc
