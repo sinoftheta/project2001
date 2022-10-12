@@ -1,11 +1,22 @@
 
 add_executable(main 
+    # src contents
     main.cpp
+
+    # src/include contents
+    include/fgl_matrix.c
+    include/fgl_transform.c
+    include/fgl_vertex.c
+    
     # add all sources here
 )
 
-target_include_directories(main PUBLIC ${CMAKE_SOURCE_DIR}/lib/gca-plus/src)# include directory with the library header files
-target_link_libraries(main PUBLIC gcaplus)# link the library (use project name of the lib)
+# src/include headers
+target_include_directories(main PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/include)
+
+# include headers in lib directory
+target_include_directories(main PUBLIC ${CMAKE_SOURCE_DIR}/lib/gca-plus/src) # include directory with the library header files
+target_link_libraries(main PUBLIC gcaplus) # link the library (use project name of the lib)
 
 target_include_directories(main PUBLIC ${CMAKE_SOURCE_DIR}/lib/ggpo/src/lib/ggpo)
 target_link_libraries(main PUBLIC GGPO)

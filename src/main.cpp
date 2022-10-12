@@ -4,22 +4,7 @@
 *   https://github.com/raysan5/raylib/wiki/Working-on-GNU-Linux building using these steps for now
 *
 ********************************************************************************************/
-#include <iostream>
-#include "ggponet.h"       // ggpo
-#include "platform_unix.h" // ggpo
-#include "raylib.h"        //raylib
-#include "fixmath.h"       // libfixmath
-#include <math.h>
-
-
-
-//#include "mbl_core.h"
-
-
-#include "GCAdapter.h"
-
-#define DEBUG_FRAME_INCRIMENT 5
-#define DEBUG_ANIM_SPEED 20.0f
+#include "p2k1.h"
 
 
 //------------------------------------------------------------------------------------
@@ -109,7 +94,15 @@ int main(void)
                 };
             }
             else{
-                cubePosition = (Vector3){ 0.5f * sinf(frameCount / DEBUG_ANIM_SPEED ), 0.0f , 0.5f * cosf(frameCount / DEBUG_ANIM_SPEED ) };
+                //cubePosition = (Vector3){ 0.5f * sinf(frameCount / DEBUG_ANIM_SPEED ), 0.0f , 0.5f * cosf(frameCount / DEBUG_ANIM_SPEED ) };
+
+                fgl_vertex_t fixed_cube_pos = (fgl_vertex_t) {
+                    fix16_sin( fix16_div(fix16_from_int(frameCount), fix16_from_float(DEBUG_ANIM_SPEED))),
+                    fix16_one >> 1,
+                    fix16_cos( fix16_div(fix16_from_int(frameCount), fix16_from_float(DEBUG_ANIM_SPEED)))
+                };
+
+                cubePosition = fix16_vert_to_vector3(fixed_cube_pos);
 
             }
 

@@ -13,5 +13,5 @@
 	ignore = untracked
 [submodule "lib/libfixmath"]
 	path = lib/libfixmath
-	url = https://github.com/PetteriAimonen/libfixmath.git
+	url = https://github.com/IanBand/libfixmath.git
 	ignore = untracked
