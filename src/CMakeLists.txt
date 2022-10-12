@@ -1,4 +1,3 @@
-cmake_minimum_required(VERSION 3.2)
 
 add_executable(main 
     main.cpp
@@ -13,3 +12,6 @@ target_link_libraries(main PUBLIC GGPO)
 
 target_include_directories(main PUBLIC ${CMAKE_SOURCE_DIR}/lib/raylib/src)
 target_link_libraries(main PUBLIC raylib)
+
+target_include_directories(main PUBLIC ${CMAKE_SOURCE_DIR}/lib/libfixmath/libfixmath)
+target_link_libraries(main PUBLIC libfixmath)

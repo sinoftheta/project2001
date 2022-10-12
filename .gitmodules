@@ -11,3 +11,7 @@
 	url = https://github.com/Shugyousha/ggpo.git
 	branch = libsdlvw-rfc
 	ignore = untracked
+[submodule "lib/libfixmath"]
+	path = lib/libfixmath
+	url = https://github.com/PetteriAimonen/libfixmath.git
+	ignore = untracked

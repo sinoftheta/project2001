@@ -5,9 +5,10 @@
 *
 ********************************************************************************************/
 #include <iostream>
-#include "ggponet.h"
-#include "platform_unix.h"
-#include "raylib.h"
+#include "ggponet.h"       // ggpo
+#include "platform_unix.h" // ggpo
+#include "raylib.h"        //raylib
+#include "fixmath.h"       // libfixmath
 #include <math.h>
 
 
