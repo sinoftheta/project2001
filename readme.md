@@ -21,3 +21,5 @@ in .gitmodules:
 fgl files attained from: https://github.com/mhfan/fgl
 
 
+
+**DUMBASS ALERT DUMBASS ALERT GOTTA USE EXTERN "C" WITH C FILES**

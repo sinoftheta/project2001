@@ -2,17 +2,11 @@
 add_executable(main 
     # src contents
     main.cpp
-
-    # src/include contents
-    include/fgl_matrix.c
-    include/fgl_transform.c
-    include/fgl_vertex.c
-    
-    # add all sources here
 )
 
-# src/include headers
+# include the headers in src/include
 target_include_directories(main PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/include)
+target_link_libraries(main PUBLIC include)
 
 # include headers in lib directory
 target_include_directories(main PUBLIC ${CMAKE_SOURCE_DIR}/lib/gca-plus/src) # include directory with the library header files
@@ -26,3 +20,5 @@ target_link_libraries(main PUBLIC raylib)
 
 target_include_directories(main PUBLIC ${CMAKE_SOURCE_DIR}/lib/libfixmath/libfixmath)
 target_link_libraries(main PUBLIC libfixmath)
+
+add_subdirectory(include)

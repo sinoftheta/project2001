@@ -6,7 +6,6 @@
 ********************************************************************************************/
 #include "p2k1.h"
 
-
 //------------------------------------------------------------------------------------
 // Program main entry point
 //------------------------------------------------------------------------------------
@@ -102,6 +101,8 @@ int main(void)
                     fix16_cos( fix16_div(fix16_from_int(frameCount), fix16_from_float(DEBUG_ANIM_SPEED)))
                 };
 
+                fgl_vertex_print(fixed_cube_pos);
+
                 cubePosition = fix16_vert_to_vector3(fixed_cube_pos);
 
             }
@@ -118,8 +119,8 @@ int main(void)
             ClearBackground(RAYWHITE);
             BeginMode3D(camera);
 
-                DrawCube     (cubePosition, 2.0f, 2.0f, 2.0f, RED);
-                DrawCubeWires(cubePosition, 2.0f, 2.0f, 2.0f, MAROON);
+                DrawSphereEx_  (cubePosition, 2.0f,  5,    10,   RED);
+                DrawSphereWires(cubePosition, 2.0f,  5,    10,   MAROON);
 
                 DrawGrid(10, 1.0f);
 
