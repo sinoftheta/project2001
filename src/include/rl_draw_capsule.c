@@ -26,6 +26,8 @@ void DrawSphereEx_(Vector3 centerPos, float radius, int rings, int slices, Color
 
                     // 6 verts total, 3 pepr tri, together they make a quad (I think lmao)
                     // also makes sense with what we are looping through
+                    
+                    // TODO: compute the 4 verts then make the tris instead of doing them at the same time, like in the cylinder function 
 
                     rlVertex3f(cosf(DEG2RAD*(270 + (180.0f/(rings + 1))*i))*sinf(DEG2RAD*(360.0f*j/slices)),
                                sinf(DEG2RAD*(270 + (180.0f/(rings + 1))*i)),
@@ -73,19 +75,39 @@ void DrawCylinderEx_(Vector3 startPos, Vector3 endPos, float startRadius, float 
 
         for (int i = 0; i < sides; i++) {
             // compute the four vertices
-            float s1 = sinf(baseAngle*(i + 0))*startRadius;
+            float s1 = sinf(baseAngle*(i + 0))*startRadius;  //s1 and c1 mean sin1 and cos1, need to draw out diagram
             float c1 = cosf(baseAngle*(i + 0))*startRadius;
-            Vector3 w1 = { startPos.x + s1*b1.x + c1*b2.x, startPos.y + s1*b1.y + c1*b2.y, startPos.z + s1*b1.z + c1*b2.z };
+            
+            // just applying a rotation or change of basis matrix? TODO: look more closely into the math here 
+            Vector3 w1 = { 
+                startPos.x + s1*b1.x + c1*b2.x, 
+                startPos.y + s1*b1.y + c1*b2.y, 
+                startPos.z + s1*b1.z + c1*b2.z 
+            };
             float s2 = sinf(baseAngle*(i + 1))*startRadius;
             float c2 = cosf(baseAngle*(i + 1))*startRadius;
-            Vector3 w2 = { startPos.x + s2*b1.x + c2*b2.x, startPos.y + s2*b1.y + c2*b2.y, startPos.z + s2*b1.z + c2*b2.z };
+            Vector3 w2 = { 
+                startPos.x + s2*b1.x + c2*b2.x, 
+                startPos.y + s2*b1.y + c2*b2.y, 
+                startPos.z + s2*b1.z + c2*b2.z 
+            };
             float s3 = sinf(baseAngle*(i + 0))*endRadius;
             float c3 = cosf(baseAngle*(i + 0))*endRadius;
-            Vector3 w3 = { endPos.x + s3*b1.x + c3*b2.x, endPos.y + s3*b1.y + c3*b2.y, endPos.z + s3*b1.z + c3*b2.z };
+            Vector3 w3 = { 
+                endPos.x + s3*b1.x + c3*b2.x, 
+                endPos.y + s3*b1.y + c3*b2.y, 
+                endPos.z + s3*b1.z + c3*b2.z 
+            };
             float s4 = sinf(baseAngle*(i + 1))*endRadius;
             float c4 = cosf(baseAngle*(i + 1))*endRadius;
-            Vector3 w4 = { endPos.x + s4*b1.x + c4*b2.x, endPos.y + s4*b1.y + c4*b2.y, endPos.z + s4*b1.z + c4*b2.z };
+            Vector3 w4 = { 
+                endPos.x + s4*b1.x + c4*b2.x, 
+                endPos.y + s4*b1.y + c4*b2.y, 
+                endPos.z + s4*b1.z + c4*b2.z 
+            };
 
+            //TODO: dont need to worry about the pyramid cases thankfully
+            
             if (startRadius > 0) {                              //
                 rlVertex3f(startPos.x, startPos.y, startPos.z); // |
                 rlVertex3f(w2.x, w2.y, w2.z);                   // T0
