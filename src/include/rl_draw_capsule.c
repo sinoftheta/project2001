@@ -27,27 +27,62 @@ void DrawSphereEx_(Vector3 centerPos, float radius, int rings, int slices, Color
                     // 6 verts total, 3 pepr tri, together they make a quad (I think lmao)
                     // also makes sense with what we are looping through
                     
-                    // TODO: compute the 4 verts then make the tris instead of doing them at the same time, like in the cylinder function 
+                    // compute the four vertices
+                    Vector3 w1 = {
+                        cosf(DEG2RAD*(270 + (180.0f/(rings + 1))*(i + 0))) * sinf(DEG2RAD*(360.0f*(j + 0)/slices)),
+                        sinf(DEG2RAD*(270 + (180.0f/(rings + 1))*(i + 0))),
+                        cosf(DEG2RAD*(270 + (180.0f/(rings + 1))*(i + 0))) * cosf(DEG2RAD*(360.0f*(j + 0)/slices))
+                    };
 
-                    rlVertex3f(cosf(DEG2RAD*(270 + (180.0f/(rings + 1))*i))*sinf(DEG2RAD*(360.0f*j/slices)),
+                    Vector3 w2 = {
+                        cosf(DEG2RAD*(270 + (180.0f/(rings + 1))*(i + 1))) * sinf(DEG2RAD*(360.0f*(j + 1)/slices)),
+                        sinf(DEG2RAD*(270 + (180.0f/(rings + 1))*(i + 1))),
+                        cosf(DEG2RAD*(270 + (180.0f/(rings + 1))*(i + 1))) * cosf(DEG2RAD*(360.0f*(j + 1)/slices))
+                    };
+
+                    Vector3 w3 = {
+                        cosf(DEG2RAD*(270 + (180.0f/(rings + 1))*(i + 1))) * sinf(DEG2RAD*(360.0f*(j + 0)/slices)),
+                        sinf(DEG2RAD*(270 + (180.0f/(rings + 1))*(i + 1))),
+                        cosf(DEG2RAD*(270 + (180.0f/(rings + 1))*(i + 1))) * cosf(DEG2RAD*(360.0f*(j + 0)/slices))
+                    };
+
+                    Vector3 w4 = {
+                        cosf(DEG2RAD*(270 + (180.0f/(rings + 1))*(i + 0))) * sinf(DEG2RAD*(360.0f*(j + 1)/slices)),
+                        sinf(DEG2RAD*(270 + (180.0f/(rings + 1))*(i + 0))),
+                        cosf(DEG2RAD*(270 + (180.0f/(rings + 1))*(i + 0))) * cosf(DEG2RAD*(360.0f*(j + 1)/slices))
+                    };
+
+                    rlVertex3f(w1.x, w1.y, w1.z);
+                    rlVertex3f(w2.x, w2.y, w2.z);
+                    rlVertex3f(w3.x, w3.y, w3.z);
+
+                    rlVertex3f(w1.x, w1.y, w1.z);
+                    rlVertex3f(w4.x, w4.y, w4.z);
+                    rlVertex3f(w2.x, w2.y, w2.z);
+
+                    /*
+                    rlVertex3f(cosf(DEG2RAD*(270 + (180.0f/(rings + 1))*i))*sinf(DEG2RAD*(360.0f*j/slices)), // w1
                                sinf(DEG2RAD*(270 + (180.0f/(rings + 1))*i)),
                                cosf(DEG2RAD*(270 + (180.0f/(rings + 1))*i))*cosf(DEG2RAD*(360.0f*j/slices)));
-                    rlVertex3f(cosf(DEG2RAD*(270 + (180.0f/(rings + 1))*(i + 1)))*sinf(DEG2RAD*(360.0f*(j + 1)/slices)),
+                    rlVertex3f(cosf(DEG2RAD*(270 + (180.0f/(rings + 1))*(i + 1)))*sinf(DEG2RAD*(360.0f*(j + 1)/slices)), // w2
                                sinf(DEG2RAD*(270 + (180.0f/(rings + 1))*(i + 1))),
                                cosf(DEG2RAD*(270 + (180.0f/(rings + 1))*(i + 1)))*cosf(DEG2RAD*(360.0f*(j + 1)/slices)));
-                    rlVertex3f(cosf(DEG2RAD*(270 + (180.0f/(rings + 1))*(i + 1)))*sinf(DEG2RAD*(360.0f*j/slices)),
+                    rlVertex3f(cosf(DEG2RAD*(270 + (180.0f/(rings + 1))*(i + 1)))*sinf(DEG2RAD*(360.0f*j/slices)), // w3
                                sinf(DEG2RAD*(270 + (180.0f/(rings + 1))*(i + 1))),
                                cosf(DEG2RAD*(270 + (180.0f/(rings + 1))*(i + 1)))*cosf(DEG2RAD*(360.0f*j/slices)));
 
-                    rlVertex3f(cosf(DEG2RAD*(270 + (180.0f/(rings + 1))*i))*sinf(DEG2RAD*(360.0f*j/slices)),
+
+
+                    rlVertex3f(cosf(DEG2RAD*(270 + (180.0f/(rings + 1))*i))*sinf(DEG2RAD*(360.0f*j/slices)), // w1
                                sinf(DEG2RAD*(270 + (180.0f/(rings + 1))*i)),
                                cosf(DEG2RAD*(270 + (180.0f/(rings + 1))*i))*cosf(DEG2RAD*(360.0f*j/slices)));
-                    rlVertex3f(cosf(DEG2RAD*(270 + (180.0f/(rings + 1))*(i)))*sinf(DEG2RAD*(360.0f*(j + 1)/slices)),
+                    rlVertex3f(cosf(DEG2RAD*(270 + (180.0f/(rings + 1))*(i)))*sinf(DEG2RAD*(360.0f*(j + 1)/slices)), // w4
                                sinf(DEG2RAD*(270 + (180.0f/(rings + 1))*(i))),
                                cosf(DEG2RAD*(270 + (180.0f/(rings + 1))*(i)))*cosf(DEG2RAD*(360.0f*(j + 1)/slices)));
-                    rlVertex3f(cosf(DEG2RAD*(270 + (180.0f/(rings + 1))*(i + 1)))*sinf(DEG2RAD*(360.0f*(j + 1)/slices)),
+                    rlVertex3f(cosf(DEG2RAD*(270 + (180.0f/(rings + 1))*(i + 1)))*sinf(DEG2RAD*(360.0f*(j + 1)/slices)), // w2
                                sinf(DEG2RAD*(270 + (180.0f/(rings + 1))*(i + 1))),
                                cosf(DEG2RAD*(270 + (180.0f/(rings + 1))*(i + 1)))*cosf(DEG2RAD*(360.0f*(j + 1)/slices)));
+                    */
                 }
             }
         rlEnd();
@@ -106,13 +141,11 @@ void DrawCylinderEx_(Vector3 startPos, Vector3 endPos, float startRadius, float 
                 endPos.z + s4*b1.z + c4*b2.z 
             };
 
-            //TODO: dont need to worry about the pyramid cases thankfully
+            // don't need T0 and T3?
             
-            if (startRadius > 0) {                              //
-                rlVertex3f(startPos.x, startPos.y, startPos.z); // |
-                rlVertex3f(w2.x, w2.y, w2.z);                   // T0
-                rlVertex3f(w1.x, w1.y, w1.z);                   // |
-            }                                                   //
+            //rlVertex3f(startPos.x, startPos.y, startPos.z);     // |
+            //rlVertex3f(w2.x, w2.y, w2.z);                       // T0
+            //rlVertex3f(w1.x, w1.y, w1.z);                       // |
                                                                 //          w2 x.-----------x startPos
             rlVertex3f(w1.x, w1.y, w1.z);                       // |           |\'.  T0    /
             rlVertex3f(w2.x, w2.y, w2.z);                       // T1          | \ '.     /
@@ -122,11 +155,10 @@ void DrawCylinderEx_(Vector3 startPos, Vector3 endPos, float startRadius, float 
             rlVertex3f(w4.x, w4.y, w4.z);                       // T2            '.  \  |T3/
             rlVertex3f(w3.x, w3.y, w3.z);                       // |               '. \ | /
                                                                 //                   '.\|/
-            if (endRadius > 0) {                                //                     'x w3
-                rlVertex3f(endPos.x, endPos.y, endPos.z);       // |
-                rlVertex3f(w3.x, w3.y, w3.z);                   // T3
-                rlVertex3f(w4.x, w4.y, w4.z);                   // |
-            }                                                   //
+            //rlVertex3f(endPos.x, endPos.y, endPos.z);           // |                   'x w3
+            //rlVertex3f(w3.x, w3.y, w3.z);                       // T3
+            //rlVertex3f(w4.x, w4.y, w4.z);                       // |
+                                                                //
         }
     rlEnd();
 }
