@@ -115,31 +115,31 @@ void DrawCylinderEx_(Vector3 startPos, Vector3 endPos, float radius, int slices,
                 float s1 = sinf(baseSliceAngle*(j + 0))*radius*cosf(baseRingAngle * ( i + 0 ));
                 float c1 = cosf(baseSliceAngle*(j + 0))*radius*cosf(baseRingAngle * ( i + 0 ));
                 Vector3 w1 = { 
-                    startPos.x + radius * sinf(baseRingAngle * ( i + 0 )) * b0.x * (i + 0) / rings + s1*b1.x + c1*b2.x, // s1*b1.x 
-                    startPos.y + radius * sinf(baseRingAngle * ( i + 0 )) * b0.y * (i + 0) / rings + s1*b1.y + c1*b2.y, 
-                    startPos.z + radius * sinf(baseRingAngle * ( i + 0 )) * b0.z * (i + 0) / rings + s1*b1.z + c1*b2.z  //         c1*b2.z
+                    startPos.x + radius * sinf(PI3_2 = PI + baseRingAngle * ( i + 0 )) * b0.x /*/ radius * (i + 0)*/ + s1*b1.x + c1*b2.x, // s1*b1.x 
+                    startPos.y + radius * sinf(PI3_2 = PI + baseRingAngle * ( i + 0 )) * b0.y  + s1*b1.y + c1*b2.y, 
+                    startPos.z + radius * sinf(PI3_2 = PI + baseRingAngle * ( i + 0 )) * b0.z  + s1*b1.z + c1*b2.z  //         c1*b2.z
                 };
                 float s2 = sinf(baseSliceAngle*(j + 1))*radius*cosf(baseRingAngle * ( i + 0 ));
                 float c2 = cosf(baseSliceAngle*(j + 1))*radius*cosf(baseRingAngle * ( i + 0 ));
                 Vector3 w2 = { 
-                    startPos.x + radius * sinf(baseRingAngle * ( i + 0 )) * b0.x * (i + 0) / rings + s2*b1.x + c2*b2.x, 
-                    startPos.y + radius * sinf(baseRingAngle * ( i + 0 )) * b0.y * (i + 0) / rings + s2*b1.y + c2*b2.y, 
-                    startPos.z + radius * sinf(baseRingAngle * ( i + 0 )) * b0.z * (i + 0) / rings + s2*b1.z + c2*b2.z 
+                    startPos.x + radius * sinf(PI3_2 = PI + baseRingAngle * ( i + 0 )) * b0.x + s2*b1.x + c2*b2.x, 
+                    startPos.y + radius * sinf(PI3_2 = PI + baseRingAngle * ( i + 0 )) * b0.y + s2*b1.y + c2*b2.y, 
+                    startPos.z + radius * sinf(PI3_2 = PI + baseRingAngle * ( i + 0 )) * b0.z + s2*b1.z + c2*b2.z 
                 };
 
                 float s3 = sinf(baseSliceAngle*(j + 0))*radius*cosf(baseRingAngle * ( i + 1 ));
                 float c3 = cosf(baseSliceAngle*(j + 0))*radius*cosf(baseRingAngle * ( i + 1 ));
                 Vector3 w3 = { 
-                    startPos.x + radius * sinf(baseRingAngle * ( i + 1 )) * b0.x * (i + 1) / rings + s3*b1.x + c3*b2.x, 
-                    startPos.y + radius * sinf(baseRingAngle * ( i + 1 )) * b0.y * (i + 1) / rings + s3*b1.y + c3*b2.y, 
-                    startPos.z + radius * sinf(baseRingAngle * ( i + 1 )) * b0.z * (i + 1) / rings + s3*b1.z + c3*b2.z 
+                    startPos.x + radius * sinf(PI3_2 = PI + baseRingAngle * ( i + 1 )) * b0.x + s3*b1.x + c3*b2.x, 
+                    startPos.y + radius * sinf(PI3_2 = PI + baseRingAngle * ( i + 1 )) * b0.y + s3*b1.y + c3*b2.y, 
+                    startPos.z + radius * sinf(PI3_2 = PI + baseRingAngle * ( i + 1 )) * b0.z + s3*b1.z + c3*b2.z 
                 };
                 float s4 = sinf(baseSliceAngle*(j + 1))*radius*cosf(baseRingAngle * ( i + 1 ));
                 float c4 = cosf(baseSliceAngle*(j + 1))*radius*cosf(baseRingAngle * ( i + 1 ));
                 Vector3 w4 = { 
-                    startPos.x + radius * sinf(baseRingAngle * ( i + 1 )) * b0.x * (i + 1) / rings + s4*b1.x + c4*b2.x, 
-                    startPos.y + radius * sinf(baseRingAngle * ( i + 1 )) * b0.y * (i + 1) / rings + s4*b1.y + c4*b2.y, 
-                    startPos.z + radius * sinf(baseRingAngle * ( i + 1 )) * b0.z * (i + 1) / rings + s4*b1.z + c4*b2.z 
+                    startPos.x + radius * sinf(PI3_2 = PI + baseRingAngle * ( i + 1 )) * b0.x + s4*b1.x + c4*b2.x, 
+                    startPos.y + radius * sinf(PI3_2 = PI + baseRingAngle * ( i + 1 )) * b0.y + s4*b1.y + c4*b2.y, 
+                    startPos.z + radius * sinf(PI3_2 = PI + baseRingAngle * ( i + 1 )) * b0.z + s4*b1.z + c4*b2.z 
                 };
 
                 rlVertex3f(w1.x, w1.y, w1.z);
