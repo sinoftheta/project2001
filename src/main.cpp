@@ -50,7 +50,7 @@ int main(void)
     // gameState
     int frameCount = 0;
     bool pause = false;                 // Pause control flag
-    Vector3 cubePosition = { 0.0f, 0.0f, 0.0f };
+    Vector3 primitivePosition = { 0.0f, 0.0f, 0.0f };
     
     int targetFPS = 60;                 // Our initial target fps
     //--------------------------------------------------------------------------------------
@@ -86,24 +86,24 @@ int main(void)
             //if (position >= GetScreenWidth()) position = 0;
 
             if(gcaLoaded && adapter_buffer[0].connected){
-                cubePosition = (Vector3){
+                primitivePosition = (Vector3){
                     0.5f * adapter_buffer[0].mainStickHorizontal / 80.0f,
                     0.0f,
                     0.5f * adapter_buffer[0].mainStickVertical   / 80.0f
                 };
             }
             else{
-                //cubePosition = (Vector3){ 0.5f * sinf(frameCount / DEBUG_ANIM_SPEED ), 0.0f , 0.5f * cosf(frameCount / DEBUG_ANIM_SPEED ) };
+                //primitivePosition = (Vector3){ 0.5f * sinf(frameCount / DEBUG_ANIM_SPEED ), 0.0f , 0.5f * cosf(frameCount / DEBUG_ANIM_SPEED ) };
 
                 fgl_vertex_t fixed_cube_pos = (fgl_vertex_t) {
                     fix16_sin( fix16_div(fix16_from_int(frameCount), fix16_from_float(DEBUG_ANIM_SPEED))),
-                    fix16_one >> 1,
+                    fix16_one << 2,
                     fix16_cos( fix16_div(fix16_from_int(frameCount), fix16_from_float(DEBUG_ANIM_SPEED)))
                 };
 
                 fgl_vertex_print(fixed_cube_pos);
 
-                cubePosition = fix16_vert_to_vector3(fixed_cube_pos);
+                primitivePosition = fix16_vert_to_vector3(fixed_cube_pos);
 
             }
 
@@ -119,13 +119,14 @@ int main(void)
             ClearBackground(RAYWHITE);
             BeginMode3D(camera);
 
-                //DrawSphereEx_  (cubePosition, 2.0f,  5,    50,   RED);
-                //DrawSphereWires(cubePosition, 2.0f,  5,    50,   MAROON);
-                DrawCylinderEx_((Vector3){0.0f, 0.0f,0.0f}, (Vector3){0.0f, 1.0f,0.0f}, 5.0f, 10, VIOLET);
+                //DrawSphereEx_  (primitivePosition, 2.0f,  5,    50,   RED);
+                //DrawSphereWires(primitivePosition, 2.0f,  5,    50,   MAROON);
+                //DrawCylinderEx_((Vector3){0.0f, 0.0f,0.30f}, (Vector3){0.0f, 3.0f,0.0f}, 5.0f, 10, VIOLET);
+
+                DrawCapsuleEx((Vector3){0.0f, 0.0f,0.0f}, primitivePosition, 1.0f, 10, 10, PURPLE);
+                DrawCapsuleWiresEx((Vector3){0.0f, 0.0f,0.0f}, primitivePosition, 1.0f, 10, 10, VIOLET);
 
                 DrawGrid(10, 1.0f);
-                //DrawLine3D((Vector3){0.0f, 0.0f,0.0f}, (Vector3){0.0f, 2.0f,0.0f}, PURPLE); // y is up, same as three js
-
             EndMode3D();
 
             // Draw ui
