@@ -23,7 +23,7 @@ extern "C"
 {
 #endif
 
-void DrawCapsuleEx(Vector3 startPos, Vector3 endPos, float radius, int slices /* analogous to sides in DrawCylinderEx */, int rings, Color color);
+void DrawCapsuleEx(Vector3 startPos, Vector3 endPos, float radius, int slices /* analogous to slices in DrawCylinderEx */, int rings, Color color);
 
 
 // functions included for now so I can comment and modify them freely
@@ -31,7 +31,7 @@ void DrawCapsuleEx(Vector3 startPos, Vector3 endPos, float radius, int slices /*
 
 void DrawSphereEx_(Vector3 centerPos, float radius, int rings, int slices, Color color);
 
-void DrawCylinderEx_(Vector3 startPos, Vector3 endPos, float startRadius, float endRadius, int sides, Color color);
+void DrawCylinderEx_(Vector3 startPos, Vector3 endPos, float radius, int slices, Color color);
 
 #ifdef __cplusplus
 }

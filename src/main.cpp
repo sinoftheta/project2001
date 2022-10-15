@@ -119,11 +119,12 @@ int main(void)
             ClearBackground(RAYWHITE);
             BeginMode3D(camera);
 
-                //DrawSphereEx_  (cubePosition, 2.0f,  5,    10,   RED);
-                //DrawSphereWires(cubePosition, 2.0f,  5,    10,   MAROON);
-                DrawCylinderEx_(cubePosition, (Vector3){0.0f, 2.0f,0.0f}, 1.0f, 1.0f, 10, VIOLET);
+                //DrawSphereEx_  (cubePosition, 2.0f,  5,    50,   RED);
+                //DrawSphereWires(cubePosition, 2.0f,  5,    50,   MAROON);
+                DrawCylinderEx_((Vector3){0.0f, 0.0f,0.0f}, (Vector3){0.0f, 1.0f,0.0f}, 5.0f, 10, VIOLET);
 
                 DrawGrid(10, 1.0f);
+                //DrawLine3D((Vector3){0.0f, 0.0f,0.0f}, (Vector3){0.0f, 2.0f,0.0f}, PURPLE); // y is up, same as three js
 
             EndMode3D();
 

@@ -25,14 +25,17 @@ void DrawSphereEx_(Vector3 centerPos, float radius, int rings, int slices, Color
                 {
 
                     // 6 verts total, 3 pepr tri, together they make a quad (I think lmao)
-                    // also makes sense with what we are looping through
+
+                    // break down sphere math into slice angle and "taper angle"
+
+                    // this just makes a unit sphere and scales it
                     
                     // compute the four vertices
-                    Vector3 w1 = {
+                    Vector3 w1 = {                                           //s1
                         cosf(DEG2RAD*(270 + (180.0f/(rings + 1))*(i + 0))) * sinf(DEG2RAD*(360.0f*(j + 0)/slices)),
                         sinf(DEG2RAD*(270 + (180.0f/(rings + 1))*(i + 0))),
                         cosf(DEG2RAD*(270 + (180.0f/(rings + 1))*(i + 0))) * cosf(DEG2RAD*(360.0f*(j + 0)/slices))
-                    };
+                    };                                                       //c1
 
                     Vector3 w2 = {
                         cosf(DEG2RAD*(270 + (180.0f/(rings + 1))*(i + 1))) * sinf(DEG2RAD*(360.0f*(j + 1)/slices)),
@@ -59,30 +62,6 @@ void DrawSphereEx_(Vector3 centerPos, float radius, int rings, int slices, Color
                     rlVertex3f(w1.x, w1.y, w1.z);
                     rlVertex3f(w4.x, w4.y, w4.z);
                     rlVertex3f(w2.x, w2.y, w2.z);
-
-                    /*
-                    rlVertex3f(cosf(DEG2RAD*(270 + (180.0f/(rings + 1))*i))*sinf(DEG2RAD*(360.0f*j/slices)), // w1
-                               sinf(DEG2RAD*(270 + (180.0f/(rings + 1))*i)),
-                               cosf(DEG2RAD*(270 + (180.0f/(rings + 1))*i))*cosf(DEG2RAD*(360.0f*j/slices)));
-                    rlVertex3f(cosf(DEG2RAD*(270 + (180.0f/(rings + 1))*(i + 1)))*sinf(DEG2RAD*(360.0f*(j + 1)/slices)), // w2
-                               sinf(DEG2RAD*(270 + (180.0f/(rings + 1))*(i + 1))),
-                               cosf(DEG2RAD*(270 + (180.0f/(rings + 1))*(i + 1)))*cosf(DEG2RAD*(360.0f*(j + 1)/slices)));
-                    rlVertex3f(cosf(DEG2RAD*(270 + (180.0f/(rings + 1))*(i + 1)))*sinf(DEG2RAD*(360.0f*j/slices)), // w3
-                               sinf(DEG2RAD*(270 + (180.0f/(rings + 1))*(i + 1))),
-                               cosf(DEG2RAD*(270 + (180.0f/(rings + 1))*(i + 1)))*cosf(DEG2RAD*(360.0f*j/slices)));
-
-
-
-                    rlVertex3f(cosf(DEG2RAD*(270 + (180.0f/(rings + 1))*i))*sinf(DEG2RAD*(360.0f*j/slices)), // w1
-                               sinf(DEG2RAD*(270 + (180.0f/(rings + 1))*i)),
-                               cosf(DEG2RAD*(270 + (180.0f/(rings + 1))*i))*cosf(DEG2RAD*(360.0f*j/slices)));
-                    rlVertex3f(cosf(DEG2RAD*(270 + (180.0f/(rings + 1))*(i)))*sinf(DEG2RAD*(360.0f*(j + 1)/slices)), // w4
-                               sinf(DEG2RAD*(270 + (180.0f/(rings + 1))*(i))),
-                               cosf(DEG2RAD*(270 + (180.0f/(rings + 1))*(i)))*cosf(DEG2RAD*(360.0f*(j + 1)/slices)));
-                    rlVertex3f(cosf(DEG2RAD*(270 + (180.0f/(rings + 1))*(i + 1)))*sinf(DEG2RAD*(360.0f*(j + 1)/slices)), // w2
-                               sinf(DEG2RAD*(270 + (180.0f/(rings + 1))*(i + 1))),
-                               cosf(DEG2RAD*(270 + (180.0f/(rings + 1))*(i + 1)))*cosf(DEG2RAD*(360.0f*(j + 1)/slices)));
-                    */
                 }
             }
         rlEnd();
@@ -92,49 +71,127 @@ void DrawSphereEx_(Vector3 centerPos, float radius, int rings, int slices, Color
 
 // Draw a cylinder with base at startPos and top at endPos
 // NOTE: It could be also used for pyramid and cone
-void DrawCylinderEx_(Vector3 startPos, Vector3 endPos, float startRadius, float endRadius, int sides, Color color)
+void DrawCylinderEx_(Vector3 startPos, Vector3 endPos, float radius, int slices, Color color)
 {
-    if (sides < 3) sides = 3;
+    if (slices < 3) slices = 3;
 
     Vector3 direction = { endPos.x - startPos.x, endPos.y - startPos.y, endPos.z - startPos.z };
     if ((direction.x == 0) && (direction.y == 0) && (direction.z == 0)) return;
 
     // Construct a basis of the base and the top face:
+    Vector3 b0 = Vector3Scale(Vector3Normalize(direction), 1.0f);
     Vector3 b1 = Vector3Normalize(Vector3Perpendicular(direction));
     Vector3 b2 = Vector3Normalize(Vector3CrossProduct(b1, direction));
 
-    float baseAngle = (2.0f*PI)/sides;
+
+
+    // we force the basis to be on the axis (note: does not update position)
+    //Vector3 b1 = (Vector3){1.0f, 0.0f, 0.0f}; 
+    //Vector3 b2 = (Vector3){0.0f, 0.0f, 1.0f};
+
+    // concerning the basis vectors: for the sphere, 
+    // the assumed direction for the sphere is always straight up, i.e. the direction is {0,1,0}
+
+
+    // TODO: make an arg
+    int rings = 10;
+
+    float baseSliceAngle = (2.0f*PI)/slices;
+    float baseRingAngle  = PI * 0.5 / rings; 
+
+    static float PI3_2 = PI * 3.0f/2.0f;
 
     rlBegin(RL_TRIANGLES);
         rlColor4ub(color.r, color.g, color.b, color.a);
+        // start cap
+        for (int i = 0; i < rings; i++)
+        {
+            for (int j = 0; j < slices; j++) 
+            {
 
-        for (int i = 0; i < sides; i++) {
+                // as we iterate through the rings they must be places higher above the center (i -> angle growing on unit circle) height we need is sin(angle)
+                // the rings must get smaller by the cos(angle)
+                // compute the four vertices
+                float s1 = sinf(baseSliceAngle*(j + 0))*radius*cosf(baseRingAngle * ( i + 0 ));
+                float c1 = cosf(baseSliceAngle*(j + 0))*radius*cosf(baseRingAngle * ( i + 0 ));
+                Vector3 w1 = { 
+                    startPos.x + radius * sinf(baseRingAngle * ( i + 0 )) * b0.x * (i + 0) / rings + s1*b1.x + c1*b2.x, // s1*b1.x 
+                    startPos.y + radius * sinf(baseRingAngle * ( i + 0 )) * b0.y * (i + 0) / rings + s1*b1.y + c1*b2.y, 
+                    startPos.z + radius * sinf(baseRingAngle * ( i + 0 )) * b0.z * (i + 0) / rings + s1*b1.z + c1*b2.z  //         c1*b2.z
+                };
+                float s2 = sinf(baseSliceAngle*(j + 1))*radius*cosf(baseRingAngle * ( i + 0 ));
+                float c2 = cosf(baseSliceAngle*(j + 1))*radius*cosf(baseRingAngle * ( i + 0 ));
+                Vector3 w2 = { 
+                    startPos.x + radius * sinf(baseRingAngle * ( i + 0 )) * b0.x * (i + 0) / rings + s2*b1.x + c2*b2.x, 
+                    startPos.y + radius * sinf(baseRingAngle * ( i + 0 )) * b0.y * (i + 0) / rings + s2*b1.y + c2*b2.y, 
+                    startPos.z + radius * sinf(baseRingAngle * ( i + 0 )) * b0.z * (i + 0) / rings + s2*b1.z + c2*b2.z 
+                };
+
+                float s3 = sinf(baseSliceAngle*(j + 0))*radius*cosf(baseRingAngle * ( i + 1 ));
+                float c3 = cosf(baseSliceAngle*(j + 0))*radius*cosf(baseRingAngle * ( i + 1 ));
+                Vector3 w3 = { 
+                    startPos.x + radius * sinf(baseRingAngle * ( i + 1 )) * b0.x * (i + 1) / rings + s3*b1.x + c3*b2.x, 
+                    startPos.y + radius * sinf(baseRingAngle * ( i + 1 )) * b0.y * (i + 1) / rings + s3*b1.y + c3*b2.y, 
+                    startPos.z + radius * sinf(baseRingAngle * ( i + 1 )) * b0.z * (i + 1) / rings + s3*b1.z + c3*b2.z 
+                };
+                float s4 = sinf(baseSliceAngle*(j + 1))*radius*cosf(baseRingAngle * ( i + 1 ));
+                float c4 = cosf(baseSliceAngle*(j + 1))*radius*cosf(baseRingAngle * ( i + 1 ));
+                Vector3 w4 = { 
+                    startPos.x + radius * sinf(baseRingAngle * ( i + 1 )) * b0.x * (i + 1) / rings + s4*b1.x + c4*b2.x, 
+                    startPos.y + radius * sinf(baseRingAngle * ( i + 1 )) * b0.y * (i + 1) / rings + s4*b1.y + c4*b2.y, 
+                    startPos.z + radius * sinf(baseRingAngle * ( i + 1 )) * b0.z * (i + 1) / rings + s4*b1.z + c4*b2.z 
+                };
+
+                rlVertex3f(w1.x, w1.y, w1.z);
+                rlVertex3f(w2.x, w2.y, w2.z);
+                rlVertex3f(w3.x, w3.y, w3.z);
+                
+                rlVertex3f(w2.x, w2.y, w2.z);   
+                rlVertex3f(w4.x, w4.y, w4.z);  
+                rlVertex3f(w3.x, w3.y, w3.z);    
+
+                DrawLine3D(w1, w2, BLACK);
+                DrawLine3D(w2, w3, BLACK);
+                DrawLine3D(w3, w1, BLACK);
+
+                DrawLine3D(w2, w4, BLACK);
+                DrawLine3D(w4, w3, BLACK);
+                DrawLine3D(w3, w2, BLACK);
+                
+            }
+        }
+        // end cap
+        // ...
+
+        // middle
+        /*for (int j = 0; j < slices; j++) 
+        {
             // compute the four vertices
-            float s1 = sinf(baseAngle*(i + 0))*startRadius;  //s1 and c1 mean sin1 and cos1, need to draw out diagram
-            float c1 = cosf(baseAngle*(i + 0))*startRadius;
+            float s1 = sinf(baseSliceAngle*(j + 0))*radius;
+            float c1 = cosf(baseSliceAngle*(j + 0))*radius;
             
             // just applying a rotation or change of basis matrix? TODO: look more closely into the math here 
             Vector3 w1 = { 
-                startPos.x + s1*b1.x + c1*b2.x, 
+                startPos.x + s1*b1.x + c1*b2.x, // s1*b1.x 
                 startPos.y + s1*b1.y + c1*b2.y, 
-                startPos.z + s1*b1.z + c1*b2.z 
+                startPos.z + s1*b1.z + c1*b2.z  //         c1*b2.z
             };
-            float s2 = sinf(baseAngle*(i + 1))*startRadius;
-            float c2 = cosf(baseAngle*(i + 1))*startRadius;
+            float s2 = sinf(baseSliceAngle*(j + 1))*radius;
+            float c2 = cosf(baseSliceAngle*(j + 1))*radius;
             Vector3 w2 = { 
                 startPos.x + s2*b1.x + c2*b2.x, 
                 startPos.y + s2*b1.y + c2*b2.y, 
                 startPos.z + s2*b1.z + c2*b2.z 
             };
-            float s3 = sinf(baseAngle*(i + 0))*endRadius;
-            float c3 = cosf(baseAngle*(i + 0))*endRadius;
+            float s3 = sinf(baseSliceAngle*(j + 0))*radius;
+            float c3 = cosf(baseSliceAngle*(j + 0))*radius;
             Vector3 w3 = { 
                 endPos.x + s3*b1.x + c3*b2.x, 
                 endPos.y + s3*b1.y + c3*b2.y, 
                 endPos.z + s3*b1.z + c3*b2.z 
             };
-            float s4 = sinf(baseAngle*(i + 1))*endRadius;
-            float c4 = cosf(baseAngle*(i + 1))*endRadius;
+            float s4 = sinf(baseSliceAngle*(j + 1))*radius;
+            float c4 = cosf(baseSliceAngle*(j + 1))*radius;
             Vector3 w4 = { 
                 endPos.x + s4*b1.x + c4*b2.x, 
                 endPos.y + s4*b1.y + c4*b2.y, 
@@ -146,19 +203,20 @@ void DrawCylinderEx_(Vector3 startPos, Vector3 endPos, float startRadius, float 
             //rlVertex3f(startPos.x, startPos.y, startPos.z);     // |
             //rlVertex3f(w2.x, w2.y, w2.z);                       // T0
             //rlVertex3f(w1.x, w1.y, w1.z);                       // |
-                                                                //          w2 x.-----------x startPos
-            rlVertex3f(w1.x, w1.y, w1.z);                       // |           |\'.  T0    /
-            rlVertex3f(w2.x, w2.y, w2.z);                       // T1          | \ '.     /
-            rlVertex3f(w3.x, w3.y, w3.z);                       // |           |T \  '.  /
-                                                                //             | 2 \ T 'x w1
-            rlVertex3f(w2.x, w2.y, w2.z);                       // |        w4 x.---\-1-|---x endPos
-            rlVertex3f(w4.x, w4.y, w4.z);                       // T2            '.  \  |T3/
-            rlVertex3f(w3.x, w3.y, w3.z);                       // |               '. \ | /
-                                                                //                   '.\|/
+                                                                    //          w2 x.-----------x startPos
+            rlVertex3f(w1.x, w1.y, w1.z);                         // |           |\'.  T0    /
+            rlVertex3f(w2.x, w2.y, w2.z);                         // T1          | \ '.     /
+            rlVertex3f(w3.x, w3.y, w3.z);                         // |           |T \  '.  /
+                                                                    //             | 2 \ T 'x w1
+            rlVertex3f(w2.x, w2.y, w2.z);                         // |        w4 x.---\-1-|---x endPos
+            rlVertex3f(w4.x, w4.y, w4.z);                         // T2            '.  \  |T3/
+            rlVertex3f(w3.x, w3.y, w3.z);                         // |               '. \ | /
+                                                                    //                   '.\|/
             //rlVertex3f(endPos.x, endPos.y, endPos.z);           // |                   'x w3
             //rlVertex3f(w3.x, w3.y, w3.z);                       // T3
             //rlVertex3f(w4.x, w4.y, w4.z);                       // |
-                                                                //
+                                                                    //
         }
+        */
     rlEnd();
 }
