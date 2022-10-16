@@ -123,8 +123,11 @@ int main(void)
                 //DrawSphereWires(primitivePosition, 2.0f,  5,    50,   MAROON);
                 //DrawCylinderEx_((Vector3){0.0f, 0.0f,0.30f}, (Vector3){0.0f, 3.0f,0.0f}, 5.0f, 10, VIOLET);
 
-                DrawCapsuleEx((Vector3){0.0f, 0.0f,0.0f}, primitivePosition, 1.0f, 10, 10, PURPLE);
-                DrawCapsuleWiresEx((Vector3){0.0f, 0.0f,0.0f}, primitivePosition, 1.0f, 10, 10, VIOLET);
+                //DrawCapsule     (primitivePosition, primitivePosition, 1.0f, 30, 20, PURPLE);
+                //DrawCapsuleWires(primitivePosition, primitivePosition, 1.0f, 30, 20, VIOLET);
+
+                DrawCapsule     (Vector3Add((Vector3){-3.0f, 1.5f, -4.0f}, Vector3Scale(primitivePosition, 1.5f)), Vector3Add((Vector3){-4.0f, -1.0f, -4.0f}, primitivePosition), 1.2f, 8, 8, VIOLET);
+                DrawCapsuleWires(Vector3Add((Vector3){-3.0f, 1.5f, -4.0f}, Vector3Scale(primitivePosition, 1.5f)), Vector3Add((Vector3){-4.0f, -1.0f, -4.0f}, primitivePosition), 1.2f, 8, 8, PURPLE);
 
                 DrawGrid(10, 1.0f);
             EndMode3D();

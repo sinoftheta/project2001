@@ -23,8 +23,8 @@ extern "C"
 {
 #endif
 
-void DrawCapsuleEx(Vector3 startPos, Vector3 endPos, float radius, int slices, int rings, Color color);
-void DrawCapsuleWiresEx(Vector3 startPos, Vector3 endPos, float radius, int slices, int rings, Color color);
+void DrawCapsule(Vector3 startPos, Vector3 endPos, float radius, int slices, int rings, Color color); // Draw a capsule with the first radius at startPos, and the second radius at endPos
+void DrawCapsuleWires(Vector3 startPos, Vector3 endPos, float radius, int slices, int rings, Color color); // Draw capsule wires with the first radius at startPos, and the second radius at endPos
 
 #ifdef __cplusplus
 }
