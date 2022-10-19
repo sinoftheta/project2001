@@ -7,11 +7,10 @@
 #include "ggponet.h"       // ggpo
 #include "platform_unix.h" // ggpo
 #include "raylib.h"        // raylib
+#include "raymath.h"
 #include "fixmath.h"       // libfixmath
 #include "GCAdapter.h"     // gcaplus
 #include "fgl_transform.h" // fgl_transform, fgl_matrix, fgl_vertex
-
-#include "rl_draw_capsule.h"
 
 #define DEBUG_FRAME_INCRIMENT 5
 #define DEBUG_ANIM_SPEED 20.0f
