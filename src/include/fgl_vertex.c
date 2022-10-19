@@ -7,34 +7,46 @@ void fgl_vec3_print(fgl_vec3_t inVertex) {
 	);
 }
 
-
-// make static inline ?
+// TODO: make all these static inline?
 fgl_vec3_t fgl_vec3_add(fgl_vec3_t a, fgl_vec3_t b) {
-	fgl_vec3_t out = (fgl_vec3_t){
+	return (fgl_vec3_t){
 		fix16_add(a.x,b.x),
 		fix16_add(a.y,b.y),
 		fix16_add(a.z,b.z)
 	};
-	return out;
 }
 
 fgl_vec3_t fgl_vec3_sub(fgl_vec3_t a, fgl_vec3_t b) {
-	fgl_vec3_t out = (fgl_vec3_t){
+	return (fgl_vec3_t){
 		fix16_sub(a.x,b.x),
 		fix16_sub(a.y,b.y),
 		fix16_sub(a.z,b.z)
 	};
-	return out;
 }
 
 fgl_vec3_t fgl_vec3_normalize(fgl_vec3_t in) {
-	fgl_vec3_t out = in;
 
-	return out;
-};
+	fix16_t m = fgl_vec3_magnitude(in);
+	
+	return (fgl_vec3_t){
+		fix16_div(in.x, m),
+		fix16_div(in.y, m),
+		fix16_div(in.z, m)
+	};
+}
 
 fix16_t fgl_vec3_dot(fgl_vec3_t a, fgl_vec3_t b) {
-	fix16_t out = a.x;
+	return fix16_add3(
+		fix16_mul(a.x, b.x),
+		fix16_mul(a.y, b.y),
+		fix16_mul(a.z, b.z)
+	);
+}
 
-	return out;
-};
+fgl_vec3_t fgl_vec3_cross(fgl_vec3_t a, fgl_vec3_t b){
+ 	return (fgl_vec3_t){
+		fix16_sub(fix16_mul(a.y,b.z),fix16_mul(a.z,b.y)),
+		fix16_sub(fix16_mul(a.z,b.x),fix16_mul(a.x,b.z)),
+		fix16_sub(fix16_mul(a.x,b.y),fix16_mul(a.y,b.x))
+	};
+}

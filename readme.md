@@ -20,6 +20,6 @@ in .gitmodules:
 
 fgl files attained from: https://github.com/mhfan/fgl
 
-
+todo: rename fgl to fix_vec3 or something its sufficently different at this point imo
 
 **DUMBASS ALERT DUMBASS ALERT GOTTA USE EXTERN "C" WITH C FILES**
