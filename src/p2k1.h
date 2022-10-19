@@ -16,6 +16,6 @@
 #define DEBUG_ANIM_SPEED 20.0f
 
 // fix16_to_float(fix16_t) is provided in fix16.h
-static inline Vector3 fix16_vert_to_vector3(fgl_vertex_t v){ return (Vector3) {fix16_to_float(v.x),fix16_to_float(v.y),fix16_to_float(v.z)}; }
+static inline Vector3 fgl_vec3_to_float_vector3(fgl_vec3_t v){ return (Vector3) {fix16_to_float(v.x),fix16_to_float(v.y),fix16_to_float(v.z)}; }
 
 #endif // __p2k1_h__

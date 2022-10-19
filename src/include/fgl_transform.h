@@ -14,7 +14,7 @@ extern "C"
 #include "fgl_matrix.h"
 #include "fgl_vertex.h"
 
-extern fgl_vertex_t fgl_transform_vertex(fgl_vertex_t inVertex, fix16_t* inMatrix);
+extern fgl_vec3_t fgl_transform_vertex(fgl_vec3_t inVertex, fix16_t* inMatrix);
 
 extern void fgl_translate(fix16_t inX, fix16_t inY, fix16_t inZ);
 extern void fgl_scale(fix16_t inX, fix16_t inY, fix16_t inZ);

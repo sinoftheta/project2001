@@ -10,18 +10,21 @@ extern "C"
 #include <stdint.h>
 
 #include <libfixmath/fixmath.h>
-
-#include "raylib.h"
-
 //#include <fgl/fgl_color.h>
 
 typedef struct {
 	fix16_t x, y, z;
-//	fix16_t u, v;
-//	fgl_color_t c;
-} fgl_vertex_t;
+} fgl_vec3_t;
 
-extern void fgl_vertex_print(fgl_vertex_t inVertex);
+void fgl_vec3_print(fgl_vec3_t inVertex);
+
+fgl_vec3_t fgl_vec3_add(fgl_vec3_t a, fgl_vec3_t b);
+
+fgl_vec3_t fgl_vec3_sub(fgl_vec3_t a, fgl_vec3_t b);
+
+fgl_vec3_t fgl_vec3_normalize(fgl_vec3_t in);
+
+fix16_t fgl_vec3_dot(fgl_vec3_t a, fgl_vec3_t b);
 
 #ifdef __cplusplus
 }

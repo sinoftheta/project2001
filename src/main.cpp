@@ -95,15 +95,15 @@ int main(void)
             else{
                 //primitivePosition = (Vector3){ 0.5f * sinf(frameCount / DEBUG_ANIM_SPEED ), 0.0f , 0.5f * cosf(frameCount / DEBUG_ANIM_SPEED ) };
 
-                fgl_vertex_t fixed_cube_pos = (fgl_vertex_t) {
+                fgl_vec3_t fixed_cube_pos = (fgl_vec3_t) {
                     fix16_sin( fix16_div(fix16_from_int(frameCount), fix16_from_float(DEBUG_ANIM_SPEED))),
                     fix16_one << 2,
                     fix16_cos( fix16_div(fix16_from_int(frameCount), fix16_from_float(DEBUG_ANIM_SPEED)))
                 };
 
-                fgl_vertex_print(fixed_cube_pos);
+                fgl_vec3_print(fixed_cube_pos);
 
-                primitivePosition = fix16_vert_to_vector3(fixed_cube_pos);
+                primitivePosition = fgl_vec3_to_float_vector3(fixed_cube_pos);
 
             }
 

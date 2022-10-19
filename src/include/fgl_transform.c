@@ -5,8 +5,8 @@
 
 
 
-fgl_vertex_t fgl_transform_vertex(fgl_vertex_t inVertex, fix16_t* inMatrix) {
-	fgl_vertex_t tempOut = inVertex;
+fgl_vec3_t fgl_transform_vertex(fgl_vec3_t inVertex, fix16_t* inMatrix) {
+	fgl_vec3_t tempOut = inVertex;
 
 	tempOut.x  = fix16_mul(inVertex.x, inMatrix[0]);
 	tempOut.x += fix16_mul(inVertex.y, inMatrix[1]);

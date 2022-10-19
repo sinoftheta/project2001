@@ -2,6 +2,7 @@
 add_executable(main 
     # src contents
     main.cpp
+    p2k1_capsule_collision.c
 )
 
 # include the headers in src/include
