@@ -15,8 +15,8 @@ extern "C"
 fgl_vec3_t closest_point_on_line_segment(fgl_vec3_t a, fgl_vec3_t b, fgl_vec3_t p);
 
 bool capsule_collision(
-    fgl_vec3_t a_tip, fgl_vec3_t a_base, fix16_t a_rad, 
-    fgl_vec3_t b_tip, fgl_vec3_t b_base, fix16_t b_rad
+    fgl_vec3_t a_A, fgl_vec3_t a_B, fix16_t a_rad, 
+    fgl_vec3_t b_A, fgl_vec3_t b_B, fix16_t b_rad
 );
 
 #ifdef __cplusplus

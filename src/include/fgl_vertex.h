@@ -16,11 +16,12 @@ typedef struct {
 	fix16_t x, y, z;
 } fgl_vec3_t;
 
-static inline fix16_t fix16_add3(fix16_t a, fix16_t b, fix16_t c){ return fix16_add(fix16_add(a,b),c); };
+// TODO: make many of these inline?
+fix16_t fix16_add3(fix16_t a, fix16_t b, fix16_t c);
 
-static inline fix16_t fgl_vec3_magnitude(fgl_vec3_t in){
-	return fix16_sqrt(fix16_add3(fix16_sq(in.x), fix16_sq(in.y), fix16_sq(in.z)));
-}
+fix16_t fgl_vec3_magnitude(fgl_vec3_t in);
+
+fgl_vec3_t fgl_vec3_scale(fgl_vec3_t in, fix16_t s);
 
 void fgl_vec3_print(fgl_vec3_t inVertex);
 

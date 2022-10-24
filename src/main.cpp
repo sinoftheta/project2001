@@ -126,10 +126,21 @@ int main(void)
                 //DrawCapsule     (primitivePosition, primitivePosition, 1.0f, 30, 20, PURPLE);
                 //DrawCapsuleWires(primitivePosition, primitivePosition, 1.0f, 30, 20, VIOLET);
 
-                DrawCapsule     (Vector3Add((Vector3){-3.0f, 1.5f, -4.0f}, Vector3Scale(primitivePosition, 1.5f)), Vector3Add((Vector3){-4.0f, -1.0f, -4.0f}, primitivePosition), 1.2f, 8, 8, VIOLET);
-                DrawCapsuleWires(Vector3Add((Vector3){-3.0f, 1.5f, -4.0f}, Vector3Scale(primitivePosition, 1.5f)), Vector3Add((Vector3){-4.0f, -1.0f, -4.0f}, primitivePosition), 1.2f, 8, 8, PURPLE);
+                //DrawCapsule     (Vector3Add((Vector3){-3.0f, 1.5f, -4.0f}, Vector3Scale(primitivePosition, 1.5f)), Vector3Add((Vector3){-4.0f, -1.0f, -4.0f}, primitivePosition), 1.2f, 8, 8, VIOLET);
+                //DrawCapsuleWires(Vector3Add((Vector3){-3.0f, 1.5f, -4.0f}, Vector3Scale(primitivePosition, 1.5f)), Vector3Add((Vector3){-4.0f, -1.0f, -4.0f}, primitivePosition), 1.2f, 8, 8, PURPLE);
 
                 DrawGrid(10, 1.0f);
+
+                fgl_vec3_t a = (fgl_vec3_t){fix16_one, fix16_one >> 1, fix16_one << 2};
+                fgl_vec3_t b = (fgl_vec3_t){0, fix16_one, fix16_one << 1};
+
+                DrawLine3D((Vector3){0.0f,0.0f,0.0f}, fgl_vec3_to_float_vector3(a), RED);
+                DrawLine3D((Vector3){0.0f,0.0f,0.0f}, fgl_vec3_to_float_vector3(b), BLUE);
+                DrawLine3D((Vector3){0.0f,0.0f,0.0f}, fgl_vec3_to_float_vector3(fgl_vec3_cross(a,b)), GREEN);
+
+                //), RED); 
+
+
             EndMode3D();
 
             // Draw ui
