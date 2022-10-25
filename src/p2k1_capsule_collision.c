@@ -48,7 +48,9 @@ bool capsule_collision(
     best_a = closest_point_on_line_segment(a_A, a_B, best_b);
 
     // now that we have found the best candidate points, perform a sphere intersection test between those points with the capluse radii
-    
-    return true;
+    fix16_t best_ab_distance = fgl_vec3_magnitude(fgl_vec3_sub(best_a, best_b));
+    fix16_t penetration_depth = fix16_sub(fix16_add(a_rad, b_rad), best_ab_distance);
+
+    return penetration_depth > 0;
 }
 

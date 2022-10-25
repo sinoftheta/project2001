@@ -50,7 +50,10 @@ int main(void)
     // gameState
     int frameCount = 0;
     bool pause = false;                 // Pause control flag
-    Vector3 primitivePosition = { 0.0f, 0.0f, 0.0f };
+
+    fgl_vec3_t cap1A, cap1B, cap2A, cap2B;
+    fix16_t cap1R, cap2R;
+    bool collision;
     
     int targetFPS = 60;                 // Our initial target fps
     //--------------------------------------------------------------------------------------
@@ -82,30 +85,58 @@ int main(void)
         {
             // Update game state
 
-            //position += 200*deltaTime;  // We move at 200 pixels per second
-            //if (position >= GetScreenWidth()) position = 0;
-
             if(gcaLoaded && adapter_buffer[0].connected){
-                primitivePosition = (Vector3){
-                    0.5f * adapter_buffer[0].mainStickHorizontal / 80.0f,
-                    0.0f,
-                    0.5f * adapter_buffer[0].mainStickVertical   / 80.0f
-                };
+
+                cap1A = (fgl_vec3_t){
+                    adapter_buffer[0].mainStickHorizontal * fix16_one >> 4,
+                    0,
+                    adapter_buffer[0].mainStickVertical   * fix16_one >> 4,
+                }; // main stick
+                cap1B = (fgl_vec3_t){
+                    adapter_buffer[0].cStickHorizontal    * fix16_one >> 4,
+                    fix16_one,
+                    adapter_buffer[0].cStickVertical      * fix16_one >> 4,
+                }; // c stick
+
+                cap1R = fix16_add(fix16_one, adapter_buffer[0].triggerR * fix16_one >> 6); // trigger
+                cap2R = fix16_add(fix16_one, adapter_buffer[0].triggerL * fix16_one >> 6); // trigger
+                
             }
             else{
-                //primitivePosition = (Vector3){ 0.5f * sinf(frameCount / DEBUG_ANIM_SPEED ), 0.0f , 0.5f * cosf(frameCount / DEBUG_ANIM_SPEED ) };
 
-                fgl_vec3_t fixed_cube_pos = (fgl_vec3_t) {
+                cap1A = (fgl_vec3_t){
                     fix16_sin( fix16_div(fix16_from_int(frameCount), fix16_from_float(DEBUG_ANIM_SPEED))),
-                    fix16_one << 2,
+                    0,
                     fix16_cos( fix16_div(fix16_from_int(frameCount), fix16_from_float(DEBUG_ANIM_SPEED)))
-                };
+                }; // main stick
+                cap1B = (fgl_vec3_t){
+                    fix16_sin( fix16_div(fix16_from_int(frameCount), fix16_from_float(DEBUG_ANIM_SPEED - 0.5f))),
+                    fix16_one,
+                    fix16_cos( fix16_div(fix16_from_int(frameCount), fix16_from_float(DEBUG_ANIM_SPEED - 0.5f)))
+                }; // c stick
 
-                fgl_vec3_print(fixed_cube_pos);
-
-                primitivePosition = fgl_vec3_to_float_vector3(fixed_cube_pos);
-
+                cap1R = fix16_add(fix16_one, fix16_sin( fix16_div(fix16_from_int(frameCount), fix16_from_float(DEBUG_ANIM_SPEED))));
+                cap2R = fix16_add(fix16_one, fix16_cos( fix16_div(fix16_from_int(frameCount), fix16_from_float(DEBUG_ANIM_SPEED))));
             }
+
+                cap2A = (fgl_vec3_t){
+                    fix16_one << 1,
+                    0,
+                    fix16_one << 1
+                };
+                cap2B = (fgl_vec3_t){
+                    fix16_one << 1,
+                    fix16_one,
+                    fix16_one << 1
+                }; // c stick
+                cap2R = fix16_one; // trigger
+
+
+
+                collision = capsule_collision(
+                    cap1A, cap1B, cap1R, 
+                    cap2A, cap2B, cap2R
+                );
 
 
             frameCount++;
@@ -126,25 +157,22 @@ int main(void)
                 //DrawCapsule     (primitivePosition, primitivePosition, 1.0f, 30, 20, PURPLE);
                 //DrawCapsuleWires(primitivePosition, primitivePosition, 1.0f, 30, 20, VIOLET);
 
-                //DrawCapsule     (Vector3Add((Vector3){-3.0f, 1.5f, -4.0f}, Vector3Scale(primitivePosition, 1.5f)), Vector3Add((Vector3){-4.0f, -1.0f, -4.0f}, primitivePosition), 1.2f, 8, 8, VIOLET);
-                //DrawCapsuleWires(Vector3Add((Vector3){-3.0f, 1.5f, -4.0f}, Vector3Scale(primitivePosition, 1.5f)), Vector3Add((Vector3){-4.0f, -1.0f, -4.0f}, primitivePosition), 1.2f, 8, 8, PURPLE);
+                
+
+                DrawCapsule     (fgl_vec3_to_float_vector3(cap1A), fgl_vec3_to_float_vector3(cap1B), fix16_to_float(cap1R), 8, 8, collision ? RED    : VIOLET);
+                DrawCapsuleWires(fgl_vec3_to_float_vector3(cap1A), fgl_vec3_to_float_vector3(cap1B), fix16_to_float(cap1R), 8, 8, collision ? MAROON : PURPLE);
+
+                DrawCapsule     (fgl_vec3_to_float_vector3(cap2A), fgl_vec3_to_float_vector3(cap2B), fix16_to_float(cap2R), 8, 8, collision ? RED    : GRAY);
+                DrawCapsuleWires(fgl_vec3_to_float_vector3(cap2A), fgl_vec3_to_float_vector3(cap2B), fix16_to_float(cap2R), 8, 8, collision ? MAROON : DARKGREEN);
 
                 DrawGrid(10, 1.0f);
-
-                fgl_vec3_t a = (fgl_vec3_t){fix16_one, fix16_one >> 1, fix16_one << 2};
-                fgl_vec3_t b = (fgl_vec3_t){0, fix16_one, fix16_one << 1};
-
-                DrawLine3D((Vector3){0.0f,0.0f,0.0f}, fgl_vec3_to_float_vector3(a), RED);
-                DrawLine3D((Vector3){0.0f,0.0f,0.0f}, fgl_vec3_to_float_vector3(b), BLUE);
-                DrawLine3D((Vector3){0.0f,0.0f,0.0f}, fgl_vec3_to_float_vector3(fgl_vec3_cross(a,b)), GREEN);
-
-                //), RED); 
 
 
             EndMode3D();
 
             // Draw ui
 
+            /*
             DrawRectangle( 10, 10, 320, 133, Fade(SKYBLUE, 0.5f));
             DrawRectangleLines( 10, 10, 320, 133, BLUE);
 
@@ -156,6 +184,8 @@ int main(void)
             DrawText("- Z to zoom to (0, 0, 0)", 40, 120, 10, DARKGRAY);
             DrawText("PRESS SPACE to PAUSE FRAME ADVANCE", 10, GetScreenHeight() - 60, 20, GRAY);
 
+            */
+            
             DrawText(TextFormat("TARGET  FPS: %i",   targetFPS),             GetScreenWidth() - 220, 10, 20, DARKGREEN);
             DrawText(TextFormat("CURRENT FPS: %i",   (int)(1.0f/deltaTime)), GetScreenWidth() - 220, 40, 20, LIME);
             DrawText(TextFormat("FRAME: %i", frameCount),                    GetScreenWidth() - 220, 70, 20, GREEN);
