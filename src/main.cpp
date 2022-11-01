@@ -22,9 +22,6 @@ int main(void)
     ControllerStatus adapter_buffer[4];
     bool gcaLoaded = gca::Setup();
 
-	
-
-
     // Define the camera to look into our 3d world
     Camera3D camera = { 0 };
     camera.position = (Vector3){ 10.0f, 10.0f, 10.0f }; // Camera position
@@ -69,7 +66,7 @@ int main(void)
             gca::Process(adapter_buffer);
             std::cout << adapter_buffer[0] << std::endl;
         }
-        
+
         UpdateCamera(&camera);
 
         if (IsKeyPressed(KEY_SPACE)) pause = !pause;

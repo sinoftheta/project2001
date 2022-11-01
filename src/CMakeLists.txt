@@ -1,8 +1,9 @@
 
 add_executable(main 
-    # src contents
+    # c files in src
     main.cpp
     p2k1_capsule_collision.c
+    p2k1_game_state.c
 )
 
 # include the headers in src/include

@@ -35,5 +35,24 @@ search list-> bounding box?
 flatten to 2d AABB based on bone position + largest bone radius?
 
 
+need a menu system:
+https://github.com/RobLoach/raylib-nuklear
 
 
+need a multiplayer connect screen with these fields:
+
+port to bind:
+stage:
+
+your player number: [p1, p2, p3, p4]
+your tag: ""
+your character: 
+
+opponent player number: [p1, p2, p3, p4]
+opponent tag:
+opponent character:
+opponent ip
+
+
+
+TODO: get rid of src/include, make fgl_vec3 into its own library (Fix16Vec3) and put it in lib/Fix16Vec3. It may turn into its own library one day or I may push it upstream to libfixmath (prob after quaternions & the skeleton stuff)
