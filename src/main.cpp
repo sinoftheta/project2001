@@ -35,17 +35,17 @@ void p2k1_process_inputs(GameInputs *p1_input, GameInputs *p2_input, bool gca_lo
         */
 
 
-        p1_input->mainStickHorizontal = adapter_buffer[0].mainStickHorizontal;
-        p1_input->mainStickVertical   = adapter_buffer[0].mainStickVertical;
-        p1_input->cStickHorizontal    = adapter_buffer[0].cStickHorizontal; 
-        p1_input->cStickVertical      = adapter_buffer[0].cStickVertical;
-        p1_input->triggerResult       = adapter_buffer[0].triggerL - adapter_buffer[0].triggerR;
+        p1_input->primary_x = adapter_buffer[0].primary_x;
+        p1_input->primary_y   = adapter_buffer[0].primary_y;
+        p1_input->secondary_x    = adapter_buffer[0].secondary_x; 
+        p1_input->secondary_y      = adapter_buffer[0].secondary_y;
+        p1_input->trigger_result       = adapter_buffer[0].trigger_l - adapter_buffer[0].trigger_r;
             
-        p2_input->mainStickHorizontal = adapter_buffer[1].mainStickHorizontal;
-        p2_input->mainStickVertical   = adapter_buffer[1].mainStickVertical;
-        p2_input->cStickHorizontal    = adapter_buffer[1].cStickHorizontal; 
-        p2_input->cStickVertical      = adapter_buffer[1].cStickVertical;
-        p2_input->triggerResult       = adapter_buffer[1].triggerL - adapter_buffer[1].triggerR;
+        p2_input->primary_x = adapter_buffer[1].primary_x;
+        p2_input->primary_y   = adapter_buffer[1].primary_y;
+        p2_input->secondary_x    = adapter_buffer[1].secondary_x; 
+        p2_input->secondary_y      = adapter_buffer[1].secondary_y;
+        p2_input->trigger_result       = adapter_buffer[1].trigger_l - adapter_buffer[1].trigger_r;
 
         
     }
@@ -101,7 +101,7 @@ int main(void)
         //----------------------------------------------------------------------------------
         p2k1_process_inputs(&p1_input, &p2_input, gca_loaded);
 
-        //std::cout << p2_input.triggerResult << std::endl;
+        //std::cout << p2_input.trigger_result << std::endl;
         p2k1_advance_game_state(&p1_input, &p2_input, &gs);
 
         //fix16_print(gs.p2_rad);

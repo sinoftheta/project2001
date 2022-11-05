@@ -51,11 +51,11 @@ typedef struct GameRenderState
 
 typedef struct GameInputs 
 {
-    int mainStickHorizontal;
-    int mainStickVertical;
-    int cStickHorizontal; 
-    int cStickVertical;
-    int triggerResult;
+    int primary_x;
+    int primary_y;
+    int secondary_x; 
+    int secondary_y;
+    int trigger_result;
 } GameInputs;
 
 typedef struct GameState 

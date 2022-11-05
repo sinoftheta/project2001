@@ -28,33 +28,33 @@ void p2k1_advance_game_state(const GameInputs *p1_input, const GameInputs *p2_in
     // p1 capsule
     gs->p1_tip = (fgl_vec3_t)
     {
-        /* X */ gs->p1_tip.x + fix16_clamp(STICK_SENSITIVITY * p1_input->mainStickHorizontal, TIP_MAX_SPEED * -1, TIP_MAX_SPEED), 
+        /* X */ gs->p1_tip.x + fix16_clamp(STICK_SENSITIVITY * p1_input->primary_x, TIP_MAX_SPEED * -1, TIP_MAX_SPEED), 
         /* Y */ TIP_HEIGHT_OFFSET + fix16_mul( TIP_AMPLITUDE, fix16_sin(fix16_mul(gs->frame_number, WIGGLE_FREQUENCY))), // bob and weave
-        /* Z */ gs->p1_tip.z + fix16_clamp(STICK_SENSITIVITY * p1_input->mainStickVertical,   TIP_MAX_SPEED * -1, TIP_MAX_SPEED) 
+        /* Z */ gs->p1_tip.z + fix16_clamp(STICK_SENSITIVITY * p1_input->primary_y,   TIP_MAX_SPEED * -1, TIP_MAX_SPEED) 
     };
     gs->p1_base = (fgl_vec3_t)
     {
-        /* X */ gs->p1_tip.x + fix16_clamp(STICK_SENSITIVITY * p1_input->cStickHorizontal, TIP_MAX_SPEED * -1, TIP_MAX_SPEED), 
+        /* X */ gs->p1_tip.x + fix16_clamp(STICK_SENSITIVITY * p1_input->secondary_x, TIP_MAX_SPEED * -1, TIP_MAX_SPEED), 
         /* Y */ fix16_mul( BASE_AMPLITUDE, fix16_sin(BASE_WIGGLE_PHASE + fix16_mul(gs->frame_number, WIGGLE_FREQUENCY))),
-        /* Z */ gs->p1_tip.z + fix16_clamp(STICK_SENSITIVITY * p1_input->cStickVertical,   TIP_MAX_SPEED * -1, TIP_MAX_SPEED) 
+        /* Z */ gs->p1_tip.z + fix16_clamp(STICK_SENSITIVITY * p1_input->secondary_y,   TIP_MAX_SPEED * -1, TIP_MAX_SPEED) 
     };
-    gs->p1_rad = fix16_add(RADIUS_OFFSET, fix16_mul(RADIUS_GROWTH_FACTOR, p1_input->triggerResult));
+    gs->p1_rad = fix16_add(RADIUS_OFFSET, fix16_mul(RADIUS_GROWTH_FACTOR, p1_input->trigger_result));
 
 
     // p2 capsule
     gs->p2_tip = (fgl_vec3_t)
     {
-        /* X */ gs->p2_tip.x + fix16_clamp(STICK_SENSITIVITY * p2_input->mainStickHorizontal, TIP_MAX_SPEED * -1, TIP_MAX_SPEED), 
+        /* X */ gs->p2_tip.x + fix16_clamp(STICK_SENSITIVITY * p2_input->primary_x, TIP_MAX_SPEED * -1, TIP_MAX_SPEED), 
         /* Y */ TIP_HEIGHT_OFFSET + fix16_mul( TIP_AMPLITUDE, fix16_cos(fix16_mul(gs->frame_number, WIGGLE_FREQUENCY))), // bob and weave
-        /* Z */ gs->p2_tip.z + fix16_clamp(STICK_SENSITIVITY * p2_input->mainStickVertical,   TIP_MAX_SPEED * -1, TIP_MAX_SPEED) 
+        /* Z */ gs->p2_tip.z + fix16_clamp(STICK_SENSITIVITY * p2_input->primary_y,   TIP_MAX_SPEED * -1, TIP_MAX_SPEED) 
     };
     gs->p2_base = (fgl_vec3_t)
     {
-        /* X */ gs->p2_tip.x + fix16_clamp(STICK_SENSITIVITY * p2_input->cStickHorizontal, TIP_MAX_SPEED * -1, TIP_MAX_SPEED), 
+        /* X */ gs->p2_tip.x + fix16_clamp(STICK_SENSITIVITY * p2_input->secondary_x, TIP_MAX_SPEED * -1, TIP_MAX_SPEED), 
         /* Y */ fix16_mul( BASE_AMPLITUDE, fix16_cos(BASE_WIGGLE_PHASE + fix16_mul(gs->frame_number, WIGGLE_FREQUENCY))),
-        /* Z */ gs->p2_tip.z + fix16_clamp(STICK_SENSITIVITY * p2_input->cStickVertical,   TIP_MAX_SPEED * -1, TIP_MAX_SPEED) 
+        /* Z */ gs->p2_tip.z + fix16_clamp(STICK_SENSITIVITY * p2_input->secondary_y,   TIP_MAX_SPEED * -1, TIP_MAX_SPEED) 
     };
-    gs->p2_rad = fix16_add(RADIUS_OFFSET, fix16_mul(RADIUS_GROWTH_FACTOR, p2_input->triggerResult));
+    gs->p2_rad = fix16_add(RADIUS_OFFSET, fix16_mul(RADIUS_GROWTH_FACTOR, p2_input->trigger_result));
 
     // decriment collision lockout TODO: max
     //gs->collision_lockout = max(gs->collision_lockout - 1, 0);
