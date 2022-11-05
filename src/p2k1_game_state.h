@@ -4,23 +4,49 @@
 #include "fgl_transform.h" // fgl_transform, fgl_matrix, fgl_vertex
 #include "raylib.h"
 
-
-
+#ifdef __cplusplus
+extern "C"
+{
+#endif
 
 /* 
     contains all game state for p2k1. based off of vectorwar example in ggpo, and more directly off of the ggpo developer guide.
 */
+
+// TODO: this is defined in 2 files, only define in one
+static inline Vector3 fgl_vec3_to_float_vector3(fgl_vec3_t v){ return (Vector3) {fix16_to_float(v.x),fix16_to_float(v.y),fix16_to_float(v.z)}; }
+
+typedef enum {
+    PLAYER1,
+    PLAYER2,
+    SIDE,
+    TOP,
+    FIXED_SIDE,
+    FIXED_TOPDOWN,
+    FREE
+} P2k1CameraMode;
+
 // GameRenderState will not be used by ggpo, it's contents are unique to each player 
 // (different players will have different camera positions for the game) and it smooths the camera movement over rollbacks
+// scene data/loaded assets will be stored in GameRenderState
 typedef struct GameRenderState 
 {
-  Vector3 prev_camera_position;
-  Vector3 prev_camera_target;
-  float prev_camera_zoom;
-  unsigned int render_frame_number;
+    Vector3 camera_position;
+    Vector3 camera_target;
+    float camera_zoom;
+    unsigned int render_frame_number;
 
-  // stuff needed for predicting and interpolating game ticks
-  // renderer rng
+    Color p1_tri_color;
+    Color p1_wire_color;
+    
+    Color p2_tri_color;
+    Color p2_wire_color;
+
+    // is_player_1 is is a placeholder for "perspective" Whos perspective of the game are we rendering? p1? p2? a spectator? debug controls? Perhapse it is a rudamentary version of "camera mode"
+    P2k1CameraMode camera_mode;
+
+    // stuff needed for predicting and interpolating game ticks
+    // renderer rng
 } GameRenderState;
 
 typedef struct GameInputs 
@@ -52,13 +78,44 @@ typedef struct GameState
     // TODO: include damage_was_dealt or prev_pX_hp fields?
 } GameState;
 
-// will not mutate anything in any GameInputs objects, will mutate GameState
-void p2k1_advance_game_state(GameInputs *p1_input, GameInputs *p2_input, GameState *gs);
+/*
+ * p2k1_init_game_render_state()
+ * reads: game_settings_obj
+ * writes: rs
+ */
+void p2k1_init_game_render_state( GameRenderState *rs /* game_settings_obj */);
+
+/*
+ * p2k1_init_game_render_state()
+ * reads: game_settings_obj
+ * writes: gs
+ */
+void p2k1_init_game_state( GameState *gs /* game_settings_obj */);
+
+/*
+ * p2k1_advance_game_state()
+ * reads: p1_inputs, p2_inputs
+ * writes: gs
+ */
+void p2k1_advance_game_state(const GameInputs *p1_input, const GameInputs *p2_input, GameState *gs);
+
+/*
+ * p2k1_advance_game_render_state()
+ * reads: gs, delta_time
+ * writes: rs
+ */
+void p2k1_advance_game_render_state(const GameState *gs, GameRenderState *rs /*, float/int delta_time */);
+
+/*
+ * p2k1_render_frame()
+ * reads: gs, rs
+ * side effects: raylib
+ */
+void p2k1_render_frame(const GameState *gs, const GameRenderState *rs);
 
 
-// will not mutate anything in GameState, will mutate GameRenderState. TODO: may take a delta time parameter for rendering as fast as possible
-// is_player_1 is is a placeholder for "perspective" Whos perspective of the game are we rendering? p1? p2? a spectator? debug controls? Perhapse it is a rudamentary version of "camera mode"
-// if we were to do scene based rendering, this function would be "apply_state_to_scene_and_render" or something
-void p2k1_render_current_frame(GameState *gs, GameRenderState *grs, bool is_player_1 /* delta time */);
+#ifdef __cplusplus
+}
+#endif
 
 #endif // __p2k1_game_state_h__

@@ -11,15 +11,19 @@
 #include "fixmath.h"       // libfixmath
 #include "GCAdapter.h"     // gcaplus
 #include "fgl_transform.h" // fgl_transform, fgl_matrix, fgl_vertex
-#include "p2k1_capsule_collision.h"
+//#include "p2k1_capsule_collision.h"
+#include "p2k1_game_state.h"
 
 #define DEBUG_FRAME_INCRIMENT 5
 #define DEBUG_ANIM_SPEED 20.0f
 
-// fix16_to_float(fix16_t) is provided in fix16.h
-static inline Vector3 fgl_vec3_to_float_vector3(fgl_vec3_t v){ return (Vector3) {fix16_to_float(v.x),fix16_to_float(v.y),fix16_to_float(v.z)}; }
+void fix16_print(fix16_t f) {
+	printf("%+.4f\n", fix16_to_dbl(f));
+}
 
 
+// fix16_to_float(fix16_t) is provided in fix16.h TODO: remove from this file
+//static inline Vector3 fgl_vec3_to_float_vector3(fgl_vec3_t v){ return (Vector3) {fix16_to_float(v.x),fix16_to_float(v.y),fix16_to_float(v.z)}; }
 
 typedef enum {
     TITLE, // TODO: can we give these the value of Scene pointers? need a way of associating Scene pointers with SceneIDs 

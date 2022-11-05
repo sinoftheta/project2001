@@ -56,3 +56,6 @@ opponent ip
 
 
 TODO: get rid of src/include, make fgl_vec3 into its own library (Fix16Vec3) and put it in lib/Fix16Vec3. It may turn into its own library one day or I may push it upstream to libfixmath (prob after quaternions & the skeleton stuff)
+
+
+TODO: need to namespace stuff, but want to keep as much as possible in c for simplicity?

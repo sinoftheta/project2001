@@ -7,7 +7,6 @@ void fgl_vec3_print(fgl_vec3_t inVertex) {
 	);
 }
 
-
 fix16_t fix16_add3(fix16_t a, fix16_t b, fix16_t c){ return fix16_add(fix16_add(a,b),c); }
 
 fix16_t fgl_vec3_magnitude(fgl_vec3_t in){

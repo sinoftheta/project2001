@@ -10,8 +10,8 @@
 #define BASE_AMPLITUDE (1 << 5)
 #define WIGGLE_FREQUENCY (1 << 3)
 #define BASE_WIGGLE_PHASE (1 << 3)
-#define RADIUS_OFFSET (1 << 7)
-#define RADIUS_GROWTH_FACTOR 1
+#define RADIUS_OFFSET fix16_one
+#define RADIUS_GROWTH_FACTOR (fix16_one << 7) // FINAL
 #define STICK_SENSITIVITY 1 // scalar for raw int, not fix16
 #define MAX_LOCKOUT_FRAMES 8
 #define TIE_THRESHOLD 5 // fix16_t but should be reeeeallly small
@@ -21,7 +21,7 @@
 //fgl_vec3_t p1_start_position = (fgl_vec3_t) { 0, fix16_one, 0 }; 
 //fgl_vec3_t p2_start_position = (fgl_vec3_t) { 0, fix16_one * -1, 0 }; 
 
-void p2k1_advance_game_state(GameInputs *p1_input, GameInputs *p2_input, GameState *gs)
+void p2k1_advance_game_state(const GameInputs *p1_input, const GameInputs *p2_input, GameState *gs)
 {
     // calc next capsule positions & radius
 
@@ -58,6 +58,12 @@ void p2k1_advance_game_state(GameInputs *p1_input, GameInputs *p2_input, GameSta
 
     // decriment collision lockout TODO: max
     //gs->collision_lockout = max(gs->collision_lockout - 1, 0);
+
+    gs->p1_tip  = (fgl_vec3_t){0, fix16_one, fix16_one * -4};
+    gs->p1_base = (fgl_vec3_t){0, 0,         fix16_one * -4};
+    
+    gs->p2_tip  = (fgl_vec3_t){0, fix16_one, fix16_one *  4};
+    gs->p2_base = (fgl_vec3_t){0, 0,         fix16_one *  4};
 
 
     // collision detection
@@ -103,13 +109,122 @@ void p2k1_advance_game_state(GameInputs *p1_input, GameInputs *p2_input, GameSta
     }
 }
 
-void p2k1_render_current_frame(GameState *gs, GameRenderState *grs, bool is_player_1 /* delta time */)
+#define CAMERA_UPDATE_WEIGHT 0.5f
+
+void p2k1_advance_game_render_state(const GameState *gs, GameRenderState *rs /* delta time */)
 {
+
+    // calc camera position, zoom, & target
+
+    // TODO: make camera position and target dependant on rs->camera_mode
+    rs->camera_position = (Vector3){ 11.0f, 5.0f, 0.0f }; 
+
+
+    rs->camera_target = Vector3Add(
+                            Vector3Scale(rs->camera_target, CAMERA_UPDATE_WEIGHT),
+                            Vector3Scale(
+                                Vector3Add(
+                                    Vector3Add(fgl_vec3_to_float_vector3(gs->p1_tip), fgl_vec3_to_float_vector3(gs->p1_base)),
+                                    Vector3Add(fgl_vec3_to_float_vector3(gs->p2_tip), fgl_vec3_to_float_vector3(gs->p2_base))
+                                ), 0.25f
+                            )
+                        );
+
+    
+    
+    /*
+    switch(rs->camera_mode)
+    {
+        case PLAYER1:
+        break;
+        case PLAYER2:
+        break;
+        case SIDE:
+        break;
+        case TOP:
+        break;
+        case FIXED_SIDE:
+        break;
+        case FIXED_TOPDOWN:
+        break;
+        case FREE:
+    }
+    */
+
     // calc colors based on collision_lockout & MAX_LOCKOUT_FRAMES
+    rs->p1_tri_color = VIOLET;
+    rs->p1_wire_color = PURPLE;
+    
+    rs->p2_tri_color = GRAY;
+    rs->p2_wire_color = DARKGREEN;
 
-    // render capsules
+    if(gs->collision_lockout > 0)
+    {
+        // TODO: change colors based on lockout value
+    }
 
-    // render ground
+    rs->render_frame_number += 1;
+}
 
-    // render fluff (boxes scattered around the edge of the field)
+void p2k1_render_frame(const GameState *gs, const GameRenderState *rs)
+{
+    Camera3D camera = { 0 };
+    camera.up = (Vector3){ 0.0f, 1.0f, 0.0f };          // Camera up vector (rotation towards target)
+    camera.fovy = 45.0f;                                // Camera field-of-view Y
+    camera.projection = CAMERA_PERSPECTIVE;             // Camera mode type
+    camera.position = rs->camera_position;
+    camera.target = rs->camera_target;
+
+    // Draw
+    //----------------------------------------------------------------------------------
+    BeginDrawing();
+
+        ClearBackground(RAYWHITE);
+        BeginMode3D(camera);
+
+            // render capsules
+            DrawCapsule     (fgl_vec3_to_float_vector3(gs->p1_base), fgl_vec3_to_float_vector3(gs->p1_tip), fix16_to_float(gs->p1_rad), 8, 8, rs->p1_tri_color );
+            DrawCapsuleWires(fgl_vec3_to_float_vector3(gs->p1_base), fgl_vec3_to_float_vector3(gs->p1_tip), fix16_to_float(gs->p1_rad), 8, 8, rs->p1_wire_color);
+
+            DrawCapsule     (fgl_vec3_to_float_vector3(gs->p2_base), fgl_vec3_to_float_vector3(gs->p2_tip), fix16_to_float(gs->p2_rad), 8, 8, rs->p2_tri_color );
+            DrawCapsuleWires(fgl_vec3_to_float_vector3(gs->p2_base), fgl_vec3_to_float_vector3(gs->p2_tip), fix16_to_float(gs->p2_rad), 8, 8, rs->p2_wire_color);
+
+            // render ground
+            DrawGrid(10, 1.0f);
+
+            // render fluff (boxes scattered around the edge of the field)
+            // TODO: see above comment
+
+        EndMode3D();
+
+        // Draw ui
+
+        
+        DrawRectangle( 10, 10, 320, 133, Fade(SKYBLUE, 0.5f));
+        DrawRectangleLines( 10, 10, 320, 133, BLUE);
+        /*
+        DrawText("Free camera default controls:", 20, 20, 10, BLACK);
+        DrawText("- Mouse Wheel to Zoom in-out", 40, 40, 10, DARKGRAY);
+        DrawText("- Mouse Wheel Pressed to Pan", 40, 60, 10, DARKGRAY);
+        DrawText("- Alt + Mouse Wheel Pressed to Rotate", 40, 80, 10, DARKGRAY);
+        DrawText("- Alt + Ctrl + Mouse Wheel Pressed for Smooth Zoom", 40, 100, 10, DARKGRAY);
+        DrawText("- Z to zoom to (0, 0, 0)", 40, 120, 10, DARKGRAY);
+        DrawText("PRESS SPACE to PAUSE FRAME ADVANCE", 10, GetScreenHeight() - 60, 20, GRAY);
+        */
+        
+        /*
+        DrawText(TextFormat("TARGET  FPS: %i",   targetFPS),             GetScreenWidth() - 220, 10, 20, DARKGREEN);
+        DrawText(TextFormat("CURRENT FPS: %i",   (int)(1.0f/deltaTime)), GetScreenWidth() - 220, 40, 20, LIME);
+        DrawText(TextFormat("FRAME: %i", frameCount),                    GetScreenWidth() - 220, 70, 20, GREEN);
+
+        if(gcaLoaded){
+            DrawText("GCA+ loaded",         GetScreenWidth() - 220, 100, 20, GREEN);
+        }
+        else{
+            DrawText("GCA+ failed to load", GetScreenWidth() - 220, 100, 20, RED);
+        }
+        */
+
+    EndDrawing();
+    SwapScreenBuffer();
 }

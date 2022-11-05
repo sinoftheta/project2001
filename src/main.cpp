@@ -6,6 +6,63 @@
 ********************************************************************************************/
 #include "p2k1.h"
 
+
+// TODO: must put this in gamestate or some other header
+// todo: gca_loaded is a placeholder for some part of the game state that manages the current active controllers and their configs
+// GameInputs may also be put in a ControllerInputs layer 
+/*
+ * p2k1_process_inputs()
+ * writes: p1_inputs, p2_inputs
+ * reads libs: raylib 
+ */
+void p2k1_process_inputs(GameInputs *p1_input, GameInputs *p2_input, bool gca_loaded)
+{
+    PollInputEvents(); // raylib poll keyboard + mouse
+
+    ControllerStatus adapter_buffer[4]; // gca
+
+    if(gca_loaded)
+    {
+        gca::Process(adapter_buffer);
+
+        //std::cout << "+++++++++++++++" << std::endl;
+        std::cout << gca::RawData() << std::endl;
+        /*
+        std::cout << adapter_buffer[0] << std::endl;
+        std::cout << adapter_buffer[1] << std::endl;
+        std::cout << adapter_buffer[2] << std::endl;
+        std::cout << adapter_buffer[3] << std::endl;\
+        */
+
+
+        p1_input->mainStickHorizontal = adapter_buffer[0].mainStickHorizontal;
+        p1_input->mainStickVertical   = adapter_buffer[0].mainStickVertical;
+        p1_input->cStickHorizontal    = adapter_buffer[0].cStickHorizontal; 
+        p1_input->cStickVertical      = adapter_buffer[0].cStickVertical;
+        p1_input->triggerResult       = adapter_buffer[0].triggerL - adapter_buffer[0].triggerR;
+            
+        p2_input->mainStickHorizontal = adapter_buffer[1].mainStickHorizontal;
+        p2_input->mainStickVertical   = adapter_buffer[1].mainStickVertical;
+        p2_input->cStickHorizontal    = adapter_buffer[1].cStickHorizontal; 
+        p2_input->cStickVertical      = adapter_buffer[1].cStickVertical;
+        p2_input->triggerResult       = adapter_buffer[1].triggerL - adapter_buffer[1].triggerR;
+
+        
+    }
+    else // TODO: get game inputs from keyboard
+    {
+        //if (IsKeyDown('Z')) camera.target = (Vector3){ 0.0f, 0.0f, 0.0f };
+        //if (IsKeyPressed(KEY_UP)) targetFPS += DEBUG_FRAME_INCRIMENT;
+        //else if (IsKeyPressed(KEY_DOWN)) targetFPS -= DEBUG_FRAME_INCRIMENT;
+
+        //if (targetFPS < DEBUG_FRAME_INCRIMENT) targetFPS = DEBUG_FRAME_INCRIMENT;
+
+    }
+
+
+
+
+}
 //------------------------------------------------------------------------------------
 // Program main entry point
 //------------------------------------------------------------------------------------
@@ -19,38 +76,20 @@ int main(void)
     InitWindow(screenWidth, screenHeight, "raylib barebones fighting engine ");
 
     // try to init GCA+
-    ControllerStatus adapter_buffer[4];
-    bool gcaLoaded = gca::Setup();
+    bool gca_loaded = gca::Setup();
 
-    // Define the camera to look into our 3d world
-    Camera3D camera = { 0 };
-    camera.position = (Vector3){ 10.0f, 10.0f, 10.0f }; // Camera position
-    camera.target = (Vector3){ 0.0f, 0.0f, 0.0f };      // Camera looking at point
-    camera.up = (Vector3){ 0.0f, 1.0f, 0.0f };          // Camera up vector (rotation towards target)
-    camera.fovy = 45.0f;                                // Camera field-of-view Y
-    camera.projection = CAMERA_PERSPECTIVE;             // Camera mode type
-
-
-    
-
-
-
-    SetCameraMode(camera, CAMERA_FREE); // Set a free camera mode
-
-    // Custom timming variables
+    // timekeeping 
     double previousTime = GetTime();    // Previous time measure
     double currentTime = 0.0;           // Current time measure
     double updateDrawTime = 0.0;        // Update + Draw time
     double waitTime = 0.0;              // Wait time (if target fps required)
     float deltaTime = 0.0f;             // Frame time (Update + Draw + Wait time)
-    
-    // gameState
-    int frameCount = 0;
-    bool pause = false;                 // Pause control flag
 
-    fgl_vec3_t cap1A, cap1B, cap2A, cap2B;
-    fix16_t cap1R, cap2R;
-    bool collision;
+    // gamestate
+    GameState gs;
+    GameRenderState rs;
+    GameInputs p1_input;
+    GameInputs p2_input;
     
     int targetFPS = 60;                 // Our initial target fps
     //--------------------------------------------------------------------------------------
@@ -60,147 +99,23 @@ int main(void)
     {
         // Update
         //----------------------------------------------------------------------------------
-        PollInputEvents();              // Poll input events (SUPPORT_CUSTOM_FRAME_CONTROL)
+        p2k1_process_inputs(&p1_input, &p2_input, gca_loaded);
 
-        if(gcaLoaded){
-            gca::Process(adapter_buffer);
-            std::cout << adapter_buffer[0] << std::endl;
-        }
+        //std::cout << p2_input.triggerResult << std::endl;
+        p2k1_advance_game_state(&p1_input, &p2_input, &gs);
 
-        UpdateCamera(&camera);
-
-        if (IsKeyPressed(KEY_SPACE)) pause = !pause;
-        if (IsKeyDown('Z')) camera.target = (Vector3){ 0.0f, 0.0f, 0.0f };
-        if (IsKeyPressed(KEY_UP)) targetFPS += DEBUG_FRAME_INCRIMENT;
-        else if (IsKeyPressed(KEY_DOWN)) targetFPS -= DEBUG_FRAME_INCRIMENT;
-
-        if (targetFPS < DEBUG_FRAME_INCRIMENT) targetFPS = DEBUG_FRAME_INCRIMENT;
-        
+        //fix16_print(gs.p2_rad);
+        //fgl_vec3_print(gs.p1_tip);
 
 
-        if (!pause)
-        {
-            // Update game state
+        p2k1_advance_game_render_state(&gs, &rs);
 
-            if(gcaLoaded && adapter_buffer[0].connected){
-
-                cap1A = (fgl_vec3_t){
-                    adapter_buffer[0].mainStickHorizontal * fix16_one >> 4,
-                    0,
-                    adapter_buffer[0].mainStickVertical   * fix16_one >> 4,
-                }; // main stick
-                cap1B = (fgl_vec3_t){
-                    adapter_buffer[0].cStickHorizontal    * fix16_one >> 4,
-                    fix16_one,
-                    adapter_buffer[0].cStickVertical      * fix16_one >> 4,
-                }; // c stick
-
-                cap1R = fix16_add(fix16_one, adapter_buffer[0].triggerR * fix16_one >> 6); // trigger
-                cap2R = fix16_add(fix16_one, adapter_buffer[0].triggerL * fix16_one >> 6); // trigger
-                
-            }
-            else{
-
-                cap1A = (fgl_vec3_t){
-                    fix16_sin( fix16_div(fix16_from_int(frameCount), fix16_from_float(DEBUG_ANIM_SPEED))),
-                    0,
-                    fix16_cos( fix16_div(fix16_from_int(frameCount), fix16_from_float(DEBUG_ANIM_SPEED)))
-                }; // main stick
-                cap1B = (fgl_vec3_t){
-                    fix16_sin( fix16_div(fix16_from_int(frameCount), fix16_from_float(DEBUG_ANIM_SPEED - 0.5f))),
-                    fix16_one,
-                    fix16_cos( fix16_div(fix16_from_int(frameCount), fix16_from_float(DEBUG_ANIM_SPEED - 0.5f)))
-                }; // c stick
-
-                cap1R = fix16_add(fix16_one, fix16_sin( fix16_div(fix16_from_int(frameCount), fix16_from_float(DEBUG_ANIM_SPEED))));
-                cap2R = fix16_add(fix16_one, fix16_cos( fix16_div(fix16_from_int(frameCount), fix16_from_float(DEBUG_ANIM_SPEED))));
-            }
-
-                cap2A = (fgl_vec3_t){
-                    fix16_one << 1,
-                    0,
-                    fix16_one << 1
-                };
-                cap2B = (fgl_vec3_t){
-                    fix16_one << 1,
-                    fix16_one,
-                    fix16_one << 1
-                }; // c stick
-                cap2R = fix16_one; // trigger
-
-
-
-                collision = capsule_collision(
-                    cap1A, cap1B, cap1R, 
-                    cap2A, cap2B, cap2R
-                );
-
-
-            frameCount++;
-        }
-        //----------------------------------------------------------------------------------
+        //std::cout << rs.camera_position.x << rs.camera_position.y << rs.camera_position.z << std::endl;
 
         // Draw
         //----------------------------------------------------------------------------------
-        BeginDrawing();
+        p2k1_render_frame(&gs, &rs);
 
-            ClearBackground(RAYWHITE);
-            BeginMode3D(camera);
-
-                //DrawSphereEx_  (primitivePosition, 2.0f,  5,    50,   RED);
-                //DrawSphereWires(primitivePosition, 2.0f,  5,    50,   MAROON);
-                //DrawCylinderEx_((Vector3){0.0f, 0.0f,0.30f}, (Vector3){0.0f, 3.0f,0.0f}, 5.0f, 10, VIOLET);
-
-                //DrawCapsule     (primitivePosition, primitivePosition, 1.0f, 30, 20, PURPLE);
-                //DrawCapsuleWires(primitivePosition, primitivePosition, 1.0f, 30, 20, VIOLET);
-
-                
-
-                DrawCapsule     (fgl_vec3_to_float_vector3(cap1A), fgl_vec3_to_float_vector3(cap1B), fix16_to_float(cap1R), 8, 8, collision ? RED    : VIOLET);
-                DrawCapsuleWires(fgl_vec3_to_float_vector3(cap1A), fgl_vec3_to_float_vector3(cap1B), fix16_to_float(cap1R), 8, 8, collision ? MAROON : PURPLE);
-
-                DrawCapsule     (fgl_vec3_to_float_vector3(cap2A), fgl_vec3_to_float_vector3(cap2B), fix16_to_float(cap2R), 8, 8, collision ? RED    : GRAY);
-                DrawCapsuleWires(fgl_vec3_to_float_vector3(cap2A), fgl_vec3_to_float_vector3(cap2B), fix16_to_float(cap2R), 8, 8, collision ? MAROON : DARKGREEN);
-
-                DrawGrid(10, 1.0f);
-
-
-            EndMode3D();
-
-            // Draw ui
-
-            /*
-            DrawRectangle( 10, 10, 320, 133, Fade(SKYBLUE, 0.5f));
-            DrawRectangleLines( 10, 10, 320, 133, BLUE);
-
-            DrawText("Free camera default controls:", 20, 20, 10, BLACK);
-            DrawText("- Mouse Wheel to Zoom in-out", 40, 40, 10, DARKGRAY);
-            DrawText("- Mouse Wheel Pressed to Pan", 40, 60, 10, DARKGRAY);
-            DrawText("- Alt + Mouse Wheel Pressed to Rotate", 40, 80, 10, DARKGRAY);
-            DrawText("- Alt + Ctrl + Mouse Wheel Pressed for Smooth Zoom", 40, 100, 10, DARKGRAY);
-            DrawText("- Z to zoom to (0, 0, 0)", 40, 120, 10, DARKGRAY);
-            DrawText("PRESS SPACE to PAUSE FRAME ADVANCE", 10, GetScreenHeight() - 60, 20, GRAY);
-
-            */
-            
-            DrawText(TextFormat("TARGET  FPS: %i",   targetFPS),             GetScreenWidth() - 220, 10, 20, DARKGREEN);
-            DrawText(TextFormat("CURRENT FPS: %i",   (int)(1.0f/deltaTime)), GetScreenWidth() - 220, 40, 20, LIME);
-            DrawText(TextFormat("FRAME: %i", frameCount),                    GetScreenWidth() - 220, 70, 20, GREEN);
-
-            if(gcaLoaded){
-                DrawText("GCA+ loaded",         GetScreenWidth() - 220, 100, 20, GREEN);
-            }
-            else{
-                DrawText("GCA+ failed to load", GetScreenWidth() - 220, 100, 20, RED);
-            }
-
-        EndDrawing();
-
-        // NOTE: In case raylib is configured to SUPPORT_CUSTOM_FRAME_CONTROL, 
-        // Events polling, screen buffer swap and frame time control must be managed by the user
-
-        SwapScreenBuffer();         // Flip the back buffer to screen (front buffer)
-        
         currentTime = GetTime();
         updateDrawTime = currentTime - previousTime;
         
