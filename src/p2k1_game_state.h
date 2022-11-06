@@ -33,7 +33,6 @@ typedef struct GameRenderState
 {
     Vector3 camera_position;
     Vector3 camera_target;
-    float camera_zoom;
     unsigned int render_frame_number;
 
     Color p1_tri_color;

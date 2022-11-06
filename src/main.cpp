@@ -35,16 +35,16 @@ void p2k1_process_inputs(GameInputs *p1_input, GameInputs *p2_input, bool gca_lo
         */
 
 
-        p1_input->primary_x      = adapter_buffer[0].primary_x   - 128;
-        p1_input->primary_y      = adapter_buffer[0].primary_y   - 128;
-        p1_input->secondary_x    = adapter_buffer[0].secondary_x - 128; 
-        p1_input->secondary_y    = adapter_buffer[0].secondary_y - 128;
+        p1_input->primary_x      = adapter_buffer[0].primary_x;
+        p1_input->primary_y      = adapter_buffer[0].primary_y;
+        p1_input->secondary_x    = adapter_buffer[0].secondary_x; 
+        p1_input->secondary_y    = adapter_buffer[0].secondary_y;
         p1_input->trigger_result = adapter_buffer[0].trigger_l - adapter_buffer[0].trigger_r;
             
-        p2_input->primary_x      = adapter_buffer[1].primary_x   - 128;
-        p2_input->primary_y      = adapter_buffer[1].primary_y   - 128;
-        p2_input->secondary_x    = adapter_buffer[1].secondary_x - 128; 
-        p2_input->secondary_y    = adapter_buffer[1].secondary_y - 128;
+        p2_input->primary_x      = adapter_buffer[1].primary_x;
+        p2_input->primary_y      = adapter_buffer[1].primary_y;
+        p2_input->secondary_x    = adapter_buffer[1].secondary_x; 
+        p2_input->secondary_y    = adapter_buffer[1].secondary_y;
         p2_input->trigger_result = adapter_buffer[1].trigger_l - adapter_buffer[1].trigger_r;
 
         
@@ -92,7 +92,12 @@ int main(void)
     GameInputs p2_input;
     
     int targetFPS = 60;                 // Our initial target fps
+
+
+    // Init
     //--------------------------------------------------------------------------------------
+    p2k1_init_game_state(&gs);
+    p2k1_init_game_render_state(&rs);
 
     // Main game loopgs->frame_number
     while (!WindowShouldClose())        // Detect window close button or ESC key
@@ -100,16 +105,15 @@ int main(void)
         // Update
         //----------------------------------------------------------------------------------
         p2k1_process_inputs(&p1_input, &p2_input, gca_loaded);
-
         //std::cout << p2_input.trigger_result << std::endl;
+        //std::cout << p1_input.primary_x << std::endl;
         p2k1_advance_game_state(&p1_input, &p2_input, &gs);
 
-        std::cout << gs.frame_number << std::endl;
-        
+        //std::cout << gs.collision_lockout << std::endl;
+
+        //std::cout << gs.frame_number << std::endl;
         //fix16_print(gs.p2_rad);
         //fgl_vec3_print(gs.p1_tip);
-
-
         p2k1_advance_game_render_state(&gs, &rs);
 
         //std::cout << rs.camera_position.x << rs.camera_position.y << rs.camera_position.z << std::endl;

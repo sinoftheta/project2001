@@ -1,32 +1,42 @@
 #include "p2k1_game_state.h"
 #include "p2k1_capsule_collision.h"
 
+#include <string.h>
+
 
 
 void p2k1_init_game_state( GameState *gs /* game_settings_obj */)
 {
     // set up inital positions, character states, stage states, frame number = 0
+    memset(gs, 0, sizeof(GameState));
 }
+
+#define CAMERA_ANCHOR (Vector3){ 11.0f, 5.0f, 0.0f } 
 
 void p2k1_init_game_render_state( GameRenderState *rs /* game_settings_obj */)
 {
     // load assets needed for game, init camera position, render frame number = 0
+
+    rs->camera_target = (Vector3){0.0f, 0.0f, 0.0f};
+    rs->camera_position = CAMERA_ANCHOR;
+    rs->render_frame_number = 0;
+
 }
 
-
-
-#define TIP_MAX_SPEED  (1 << 7)           // fix16 units/frame
-#define BASE_MAX_SPEED (1 << 7) + ( 1 << 6)
-
 #define TIP_HEIGHT_OFFSET fix16_one
+
 #define TIP_AMPLITUDE (fix16_one >> 2)
 #define BASE_AMPLITUDE (fix16_one >> 3)
 #define WIGGLE_FREQUENCY (fix16_one >> 3)
 #define BASE_WIGGLE_PHASE fix16_one
+
 #define RADIUS_OFFSET fix16_one
 #define RADIUS_GROWTH_FACTOR (fix16_one << 7) // FINAL
-#define STICK_SENSITIVITY 1 // scalar for raw int, not fix16
-#define MAX_LOCKOUT_FRAMES 8
+
+#define TIP_POSITION_SCALE (fix16_one >> 4)
+#define BASE_POSITION_SCALE ((fix16_one >> 5) + (fix16_one >> 6))
+
+#define MAX_LOCKOUT_FRAMES 40
 #define TIE_THRESHOLD 5 // fix16_t but should be reeeeallly small
 
 
@@ -39,20 +49,21 @@ static fgl_vec3_t p2_base_offset = {0, 0,              fix16_one *  4};
 void p2k1_advance_game_state(const GameInputs *p1_input, const GameInputs *p2_input, GameState *gs)
 {
     // calc next capsule positions & radius
+    // note: typically we would have speed & possibly acceleration and use newtons method of integration to get position
 
     // p1 capsule
     gs->p1_tip = fgl_vec3_add((fgl_vec3_t)
     {
-        /* X */ 0, // gs->p1_tip.x + fix16_clamp(STICK_SENSITIVITY * p1_input->primary_x, TIP_MAX_SPEED * -1, TIP_MAX_SPEED), 
+        /* X */ fix16_mul(fix16_from_int(p1_input->primary_y), TIP_POSITION_SCALE),
         /* Y */ fix16_mul( TIP_AMPLITUDE, fix16_sin(fix16_mul(fix16_from_int(gs->frame_number), WIGGLE_FREQUENCY))), // bob and weave
-        /* Z */ 0,/*gs->p1_tip.z +*/ //fix16_clamp(STICK_SENSITIVITY * p1_input->primary_y,   TIP_MAX_SPEED * -1, TIP_MAX_SPEED) 
+        /* Z */ fix16_mul(fix16_from_int(p1_input->primary_x), TIP_POSITION_SCALE),
     }, p1_tip_offset);
 
     gs->p1_base = fgl_vec3_add((fgl_vec3_t)
     {
-        /* X */ 0, // gs->p1_tip.x + fix16_clamp(STICK_SENSITIVITY * p1_input->secondary_x, TIP_MAX_SPEED * -1, TIP_MAX_SPEED), 
-        /* Y */ fix16_mul( BASE_AMPLITUDE, fix16_sin(BASE_WIGGLE_PHASE + fix16_mul(fix16_from_int(gs->frame_number), WIGGLE_FREQUENCY))),
-        /* Z */ 0 // gs->p1_tip.z + fix16_clamp(STICK_SENSITIVITY * p1_input->secondary_y,   TIP_MAX_SPEED * -1, TIP_MAX_SPEED) 
+        /* X */ fix16_mul(fix16_from_int(p1_input->secondary_y), BASE_POSITION_SCALE),
+        /* Y */ fix16_mul( BASE_AMPLITUDE, fix16_sin( fix16_add( BASE_WIGGLE_PHASE, fix16_mul( fix16_from_int(gs->frame_number), WIGGLE_FREQUENCY )))),
+        /* Z */ fix16_mul(fix16_from_int(p1_input->secondary_x), BASE_POSITION_SCALE),
     }, p1_base_offset);
 
     gs->p1_rad = fix16_add(RADIUS_OFFSET, fix16_mul(RADIUS_GROWTH_FACTOR, p1_input->trigger_result));
@@ -61,16 +72,16 @@ void p2k1_advance_game_state(const GameInputs *p1_input, const GameInputs *p2_in
     // p2 capsule
     gs->p2_tip = fgl_vec3_add((fgl_vec3_t)
     {
-        /* X */ 0, // gs->p2_tip.x + fix16_clamp(STICK_SENSITIVITY * p2_input->primary_x, TIP_MAX_SPEED * -1, TIP_MAX_SPEED), 
-        /* Y */ fix16_mul( TIP_AMPLITUDE, fix16_cos(fix16_mul(fix16_from_int(gs->frame_number), WIGGLE_FREQUENCY))),
-        /* Z */ 0 // gs->p2_tip.z + fix16_clamp(STICK_SENSITIVITY * p2_input->primary_y,   TIP_MAX_SPEED * -1, TIP_MAX_SPEED) 
+        /* X */ fix16_mul(fix16_from_int(p2_input->primary_y), TIP_POSITION_SCALE),
+        /* Y */ fix16_mul( TIP_AMPLITUDE, fix16_cos(fix16_mul(fix16_from_int(gs->frame_number), WIGGLE_FREQUENCY))), // bob and weave
+        /* Z */ fix16_mul(fix16_from_int(p2_input->primary_x), TIP_POSITION_SCALE),
     }, p2_tip_offset);
 
     gs->p2_base = fgl_vec3_add((fgl_vec3_t)
     {
-        /* X */ 0, // gs->p2_tip.x + fix16_clamp(STICK_SENSITIVITY * p2_input->secondary_x, TIP_MAX_SPEED * -1, TIP_MAX_SPEED), 
-        /* Y */ fix16_mul( BASE_AMPLITUDE, fix16_cos(BASE_WIGGLE_PHASE + fix16_mul(fix16_from_int(gs->frame_number), WIGGLE_FREQUENCY))),
-        /* Z */ 0 // gs->p2_tip.z + fix16_clamp(STICK_SENSITIVITY * p2_input->secondary_y,   TIP_MAX_SPEED * -1, TIP_MAX_SPEED) 
+        /* X */ fix16_mul(fix16_from_int(p2_input->secondary_y), BASE_POSITION_SCALE),
+        /* Y */ fix16_mul( BASE_AMPLITUDE, fix16_cos( fix16_add( BASE_WIGGLE_PHASE, fix16_mul( fix16_from_int(gs->frame_number), WIGGLE_FREQUENCY )))),
+        /* Z */ fix16_mul(fix16_from_int(p2_input->secondary_x), BASE_POSITION_SCALE),
     }, p2_base_offset);
 
     gs->p2_rad = fix16_add(RADIUS_OFFSET, fix16_mul(RADIUS_GROWTH_FACTOR, p2_input->trigger_result));
@@ -131,29 +142,48 @@ void p2k1_advance_game_state(const GameInputs *p1_input, const GameInputs *p2_in
     gs->frame_number += 1;
 }
 
-#define CAMERA_UPDATE_WEIGHT 0.265f
+#define CAMERA_UPDATE_WEIGHT 0.9f  // 0.9f = 90% previous camera values, 10% curent camera values. closer to 1.0f means slower camera movement
+#define CAMERA_ZOOM_SCALE 0.1f
+// see  CAMERA_ANCHOR
 
 void p2k1_advance_game_render_state(const GameState *gs, GameRenderState *rs /* delta time */)
 {
 
     // calc camera position, zoom, & target
+    // TODO: independant vec3 library would be nice to have
+
+    Vector3 camera_target = Vector3Add(
+                                Vector3Scale(rs->camera_target, CAMERA_UPDATE_WEIGHT),
+                                Vector3Scale(
+                                    Vector3Add(
+                                        Vector3Add(fgl_vec3_to_float_vector3(gs->p1_tip), fgl_vec3_to_float_vector3(gs->p1_base)),
+                                        Vector3Add(fgl_vec3_to_float_vector3(gs->p2_tip), fgl_vec3_to_float_vector3(gs->p2_base))
+                                    ), 0.25f * (1.0f - CAMERA_UPDATE_WEIGHT)
+                                )
+                            );
 
     // TODO: make camera position and target dependant on rs->camera_mode
-    rs->camera_position = (Vector3){ 11.0f, 5.0f, 0.0f }; 
+    Vector3 camera_dir = Vector3Subtract(CAMERA_ANCHOR, rs->camera_target); 
+
+    // proportional to largest distance between p1 an p2
+    float d1 = Vector3Length(Vector3Subtract(fgl_vec3_to_float_vector3(gs->p1_tip),  fgl_vec3_to_float_vector3(gs->p2_tip) ));
+    float d2 = Vector3Length(Vector3Subtract(fgl_vec3_to_float_vector3(gs->p1_tip),  fgl_vec3_to_float_vector3(gs->p2_base)));
+    float d3 = Vector3Length(Vector3Subtract(fgl_vec3_to_float_vector3(gs->p1_base), fgl_vec3_to_float_vector3(gs->p2_base)));
+
+    float max_dist = d1;
+    if(d2 > max_dist) max_dist = d2;
+    if(d3 > max_dist) max_dist = d3;
 
 
-    rs->camera_target = Vector3Add(
-                            Vector3Scale(rs->camera_target, CAMERA_UPDATE_WEIGHT),
-                            Vector3Scale(
-                                Vector3Add(
-                                    Vector3Add(fgl_vec3_to_float_vector3(gs->p1_tip), fgl_vec3_to_float_vector3(gs->p1_base)),
-                                    Vector3Add(fgl_vec3_to_float_vector3(gs->p2_tip), fgl_vec3_to_float_vector3(gs->p2_base))
-                                ), 0.25f
-                            )
-                        );
-
+    float camera_distance = 0.9 + max_dist * CAMERA_ZOOM_SCALE; // looks good between about 1.1f and 1.3f
     
-    
+    rs->camera_position =   Vector3Add(
+                                Vector3Scale( rs->camera_position, CAMERA_UPDATE_WEIGHT),
+                                Vector3Scale( Vector3Add(Vector3Scale(camera_dir, camera_distance), rs->camera_target), 1.0f - CAMERA_UPDATE_WEIGHT)
+                            );
+
+    //rs->camera_position = Vector3Add(Vector3Scale(camera_dir, camera_distance), rs->camera_target);
+    rs->camera_target = camera_target;
     /*
     switch(rs->camera_mode)
     {
@@ -182,7 +212,9 @@ void p2k1_advance_game_render_state(const GameState *gs, GameRenderState *rs /* 
 
     if(gs->collision_lockout > 0)
     {
-        // TODO: change colors based on lockout value
+        // change colors based on lockout value
+        rs->p1_tri_color  = (Color){gs->collision_lockout * 2 + 200, gs->collision_lockout * 3, gs->collision_lockout * 4, 255};        
+        rs->p2_tri_color  = (Color){gs->collision_lockout * 2, gs->collision_lockout * 3 + 50, gs->collision_lockout * 4 + 50, 255};
     }
 
     rs->render_frame_number += 1;
@@ -222,8 +254,8 @@ void p2k1_render_frame(const GameState *gs, const GameRenderState *rs)
         // Draw ui
 
         
-        DrawRectangle( 10, 10, 320, 133, Fade(SKYBLUE, 0.5f));
-        DrawRectangleLines( 10, 10, 320, 133, BLUE);
+        //DrawRectangle( 10, 10, 320, 133, Fade(SKYBLUE, 0.5f));
+        //DrawRectangleLines( 10, 10, 320, 133, BLUE);
         /*
         DrawText("Free camera default controls:", 20, 20, 10, BLACK);
         DrawText("- Mouse Wheel to Zoom in-out", 40, 40, 10, DARKGRAY);
