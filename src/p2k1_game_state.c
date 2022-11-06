@@ -1,15 +1,28 @@
 #include "p2k1_game_state.h"
-
 #include "p2k1_capsule_collision.h"
+
+
+
+void p2k1_init_game_state( GameState *gs /* game_settings_obj */)
+{
+    // set up inital positions, character states, stage states, frame number = 0
+}
+
+void p2k1_init_game_render_state( GameRenderState *rs /* game_settings_obj */)
+{
+    // load assets needed for game, init camera position, render frame number = 0
+}
+
+
 
 #define TIP_MAX_SPEED  (1 << 7)           // fix16 units/frame
 #define BASE_MAX_SPEED (1 << 7) + ( 1 << 6)
 
 #define TIP_HEIGHT_OFFSET fix16_one
-#define TIP_AMPLITUDE (1 << 5)
-#define BASE_AMPLITUDE (1 << 5)
-#define WIGGLE_FREQUENCY (1 << 3)
-#define BASE_WIGGLE_PHASE (1 << 3)
+#define TIP_AMPLITUDE (fix16_one >> 2)
+#define BASE_AMPLITUDE (fix16_one >> 3)
+#define WIGGLE_FREQUENCY (fix16_one >> 3)
+#define BASE_WIGGLE_PHASE fix16_one
 #define RADIUS_OFFSET fix16_one
 #define RADIUS_GROWTH_FACTOR (fix16_one << 7) // FINAL
 #define STICK_SENSITIVITY 1 // scalar for raw int, not fix16
@@ -17,54 +30,61 @@
 #define TIE_THRESHOLD 5 // fix16_t but should be reeeeallly small
 
 
-// TODO make these static const?
-//fgl_vec3_t p1_start_position = (fgl_vec3_t) { 0, fix16_one, 0 }; 
-//fgl_vec3_t p2_start_position = (fgl_vec3_t) { 0, fix16_one * -1, 0 }; 
+static fgl_vec3_t p1_tip_offset  = {0, fix16_one << 1, fix16_one * -4};
+static fgl_vec3_t p1_base_offset = {0, 0,              fix16_one * -4};
+
+static fgl_vec3_t p2_tip_offset  = {0, fix16_one << 1, fix16_one *  4};
+static fgl_vec3_t p2_base_offset = {0, 0,              fix16_one *  4};
 
 void p2k1_advance_game_state(const GameInputs *p1_input, const GameInputs *p2_input, GameState *gs)
 {
     // calc next capsule positions & radius
 
     // p1 capsule
-    gs->p1_tip = (fgl_vec3_t)
+    gs->p1_tip = fgl_vec3_add((fgl_vec3_t)
     {
-        /* X */ gs->p1_tip.x + fix16_clamp(STICK_SENSITIVITY * p1_input->primary_x, TIP_MAX_SPEED * -1, TIP_MAX_SPEED), 
-        /* Y */ TIP_HEIGHT_OFFSET + fix16_mul( TIP_AMPLITUDE, fix16_sin(fix16_mul(gs->frame_number, WIGGLE_FREQUENCY))), // bob and weave
-        /* Z */ gs->p1_tip.z + fix16_clamp(STICK_SENSITIVITY * p1_input->primary_y,   TIP_MAX_SPEED * -1, TIP_MAX_SPEED) 
-    };
-    gs->p1_base = (fgl_vec3_t)
+        /* X */ 0, // gs->p1_tip.x + fix16_clamp(STICK_SENSITIVITY * p1_input->primary_x, TIP_MAX_SPEED * -1, TIP_MAX_SPEED), 
+        /* Y */ fix16_mul( TIP_AMPLITUDE, fix16_sin(fix16_mul(fix16_from_int(gs->frame_number), WIGGLE_FREQUENCY))), // bob and weave
+        /* Z */ 0,/*gs->p1_tip.z +*/ //fix16_clamp(STICK_SENSITIVITY * p1_input->primary_y,   TIP_MAX_SPEED * -1, TIP_MAX_SPEED) 
+    }, p1_tip_offset);
+
+    gs->p1_base = fgl_vec3_add((fgl_vec3_t)
     {
-        /* X */ gs->p1_tip.x + fix16_clamp(STICK_SENSITIVITY * p1_input->secondary_x, TIP_MAX_SPEED * -1, TIP_MAX_SPEED), 
-        /* Y */ fix16_mul( BASE_AMPLITUDE, fix16_sin(BASE_WIGGLE_PHASE + fix16_mul(gs->frame_number, WIGGLE_FREQUENCY))),
-        /* Z */ gs->p1_tip.z + fix16_clamp(STICK_SENSITIVITY * p1_input->secondary_y,   TIP_MAX_SPEED * -1, TIP_MAX_SPEED) 
-    };
+        /* X */ 0, // gs->p1_tip.x + fix16_clamp(STICK_SENSITIVITY * p1_input->secondary_x, TIP_MAX_SPEED * -1, TIP_MAX_SPEED), 
+        /* Y */ fix16_mul( BASE_AMPLITUDE, fix16_sin(BASE_WIGGLE_PHASE + fix16_mul(fix16_from_int(gs->frame_number), WIGGLE_FREQUENCY))),
+        /* Z */ 0 // gs->p1_tip.z + fix16_clamp(STICK_SENSITIVITY * p1_input->secondary_y,   TIP_MAX_SPEED * -1, TIP_MAX_SPEED) 
+    }, p1_base_offset);
+
     gs->p1_rad = fix16_add(RADIUS_OFFSET, fix16_mul(RADIUS_GROWTH_FACTOR, p1_input->trigger_result));
 
 
     // p2 capsule
-    gs->p2_tip = (fgl_vec3_t)
+    gs->p2_tip = fgl_vec3_add((fgl_vec3_t)
     {
-        /* X */ gs->p2_tip.x + fix16_clamp(STICK_SENSITIVITY * p2_input->primary_x, TIP_MAX_SPEED * -1, TIP_MAX_SPEED), 
-        /* Y */ TIP_HEIGHT_OFFSET + fix16_mul( TIP_AMPLITUDE, fix16_cos(fix16_mul(gs->frame_number, WIGGLE_FREQUENCY))), // bob and weave
-        /* Z */ gs->p2_tip.z + fix16_clamp(STICK_SENSITIVITY * p2_input->primary_y,   TIP_MAX_SPEED * -1, TIP_MAX_SPEED) 
-    };
-    gs->p2_base = (fgl_vec3_t)
+        /* X */ 0, // gs->p2_tip.x + fix16_clamp(STICK_SENSITIVITY * p2_input->primary_x, TIP_MAX_SPEED * -1, TIP_MAX_SPEED), 
+        /* Y */ fix16_mul( TIP_AMPLITUDE, fix16_cos(fix16_mul(fix16_from_int(gs->frame_number), WIGGLE_FREQUENCY))),
+        /* Z */ 0 // gs->p2_tip.z + fix16_clamp(STICK_SENSITIVITY * p2_input->primary_y,   TIP_MAX_SPEED * -1, TIP_MAX_SPEED) 
+    }, p2_tip_offset);
+
+    gs->p2_base = fgl_vec3_add((fgl_vec3_t)
     {
-        /* X */ gs->p2_tip.x + fix16_clamp(STICK_SENSITIVITY * p2_input->secondary_x, TIP_MAX_SPEED * -1, TIP_MAX_SPEED), 
-        /* Y */ fix16_mul( BASE_AMPLITUDE, fix16_cos(BASE_WIGGLE_PHASE + fix16_mul(gs->frame_number, WIGGLE_FREQUENCY))),
-        /* Z */ gs->p2_tip.z + fix16_clamp(STICK_SENSITIVITY * p2_input->secondary_y,   TIP_MAX_SPEED * -1, TIP_MAX_SPEED) 
-    };
+        /* X */ 0, // gs->p2_tip.x + fix16_clamp(STICK_SENSITIVITY * p2_input->secondary_x, TIP_MAX_SPEED * -1, TIP_MAX_SPEED), 
+        /* Y */ fix16_mul( BASE_AMPLITUDE, fix16_cos(BASE_WIGGLE_PHASE + fix16_mul(fix16_from_int(gs->frame_number), WIGGLE_FREQUENCY))),
+        /* Z */ 0 // gs->p2_tip.z + fix16_clamp(STICK_SENSITIVITY * p2_input->secondary_y,   TIP_MAX_SPEED * -1, TIP_MAX_SPEED) 
+    }, p2_base_offset);
+
     gs->p2_rad = fix16_add(RADIUS_OFFSET, fix16_mul(RADIUS_GROWTH_FACTOR, p2_input->trigger_result));
 
     // decriment collision lockout TODO: max
-    //gs->collision_lockout = max(gs->collision_lockout - 1, 0);
+    gs->collision_lockout = (gs->collision_lockout == 0) ? 0 : gs->collision_lockout - 1;
 
+    /*
     gs->p1_tip  = (fgl_vec3_t){0, fix16_one, fix16_one * -4};
     gs->p1_base = (fgl_vec3_t){0, 0,         fix16_one * -4};
     
     gs->p2_tip  = (fgl_vec3_t){0, fix16_one, fix16_one *  4};
     gs->p2_base = (fgl_vec3_t){0, 0,         fix16_one *  4};
-
+    */
 
     // collision detection
     if(capsule_collision(gs->p1_tip, gs->p1_base, gs->p1_rad, gs->p2_tip, gs->p2_base, gs->p2_rad))
@@ -107,9 +127,11 @@ void p2k1_advance_game_state(const GameInputs *p1_input, const GameInputs *p2_in
         // reset collision lockout
         gs->collision_lockout = MAX_LOCKOUT_FRAMES;
     }
+
+    gs->frame_number += 1;
 }
 
-#define CAMERA_UPDATE_WEIGHT 0.5f
+#define CAMERA_UPDATE_WEIGHT 0.265f
 
 void p2k1_advance_game_render_state(const GameState *gs, GameRenderState *rs /* delta time */)
 {
