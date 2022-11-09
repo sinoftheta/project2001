@@ -1,0 +1,1 @@
+fork of [fgl](https://github.com/mhfan/fgl). More focused around 3d vector math. Main goal is to add a fixed point skeletal animation system. May push upstream one day but it will probably be to libfixmath or its own repo since fgl isnt being maintained. 
