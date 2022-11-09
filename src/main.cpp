@@ -6,6 +6,9 @@
 ********************************************************************************************/
 #include "p2k1.h"
 
+#include "imgui.h"
+#include "rlImGui.h"
+
 
 // TODO: must put this in gamestate or some other header
 // todo: gca_loaded is a placeholder for some part of the game state that manages the current active controllers and their configs
@@ -75,6 +78,8 @@ int main(void)
     
     InitWindow(screenWidth, screenHeight, "raylib barebones fighting engine ");
 
+    rlImGuiSetup(true);
+
     // try to init GCA+
     bool gca_loaded = gca::Setup();
 
@@ -121,6 +126,22 @@ int main(void)
         // Draw
         //----------------------------------------------------------------------------------
         p2k1_render_frame(&gs, &rs);
+
+        BeginDrawing();
+
+		// start ImGui Conent
+		rlImGuiBegin();
+
+		// show ImGui Content
+		bool open = true;
+		ImGui::ShowDemoWindow(&open);
+
+		// end ImGui Content
+		rlImGuiEnd();
+
+		EndDrawing();
+
+
 
         currentTime = GetTime();
         updateDrawTime = currentTime - previousTime;

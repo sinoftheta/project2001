@@ -10,7 +10,8 @@
 #include "raymath.h"
 #include "fixmath.h"       // libfixmath
 #include "GCAdapter.h"     // gcaplus
-#include "fgl_transform.h" // fgl_transform, fgl_matrix, fgl_vertex
+//#include "fgl_transform.h" // fgl_transform, fgl_matrix, fgl_vertex
+#include "fgl.h"
 //#include "p2k1_capsule_collision.h"
 #include "p2k1_game_state.h"
 

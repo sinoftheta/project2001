@@ -15,3 +15,7 @@
 	path = lib/libfixmath
 	url = https://github.com/IanBand/libfixmath.git
 	ignore = untracked
+[submodule "lib/imgui/imgui"]
+	path = lib/imgui/imgui
+	url = https://github.com/ocornut/imgui.git
+	ignore = untracked

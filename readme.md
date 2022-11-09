@@ -53,9 +53,37 @@ opponent tag:
 opponent character:
 opponent ip
 
-
+https://stackoverflow.com/questions/48554758/why-create-an-include-directory-in-c-and-c-projects
 
 TODO: get rid of src/include, make fgl_vec3 into its own library (Fix16Vec3) and put it in lib/Fix16Vec3. It may turn into its own library one day or I may push it upstream to libfixmath (prob after quaternions & the skeleton stuff)
 
 
 TODO: need to namespace stuff, but want to keep as much as possible in c for simplicity?
+
+
+next steps:
+1. [ ] add https://github.com/RobLoach/raylib-nuklear to project
+2. [ ] create main menu scene (state update + render)
+3. [ ] create ggpo info scene (state update + render)
+    - use nk_input_glyph as text box
+    - 
+4. [ ] finalize(?) mini engine (scene stack + arbitrary update logic) be able two switch between engine scenes
+5. integrate ggpo
+6. game settings initialization/syncronization (use sockets?)
+
+- [ ] assess rewrite in rust
+- [ ] seperate engine into library
+
+phase 2:
+1. [ ] fixed point skeleton
+2. [ ] asset packing & import (Doom's .wad analog) (need unreal, ogre, irrlicht assesments)
+3. [ ] blender rig -> fixed point rig conversion tool
+4. [ ] stage building tool
+5. [ ] stage / ecb course grain + fine grain collision
+6. [ ] sound assets + sound thread
+
+phase 3:
+1. [ ] windows build
+2. [ ] assemble art team
+3. [ ] asset creation
+4. [ ] game finalization/release

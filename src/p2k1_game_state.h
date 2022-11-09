@@ -1,7 +1,8 @@
 #ifndef __p2k1_game_state_h__
 #define __p2k1_game_state_h__
 
-#include "fgl_transform.h" // fgl_transform, fgl_matrix, fgl_vertex
+//#include "fgl_transform.h" // fgl_transform, fgl_matrix, fgl_vertex
+#include "fgl.h"
 #include "raylib.h"
 
 #ifdef __cplusplus

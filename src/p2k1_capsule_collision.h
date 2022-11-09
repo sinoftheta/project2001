@@ -10,7 +10,8 @@ extern "C"
 #include "raymath.h"
 #include "fixmath.h"       // libfixmath
 
-#include "fgl_transform.h" // fgl_transform, fgl_matrix, fgl_vertex
+//#include "fgl_transform.h" // fgl_transform, fgl_matrix, fgl_vertex
+#include "fgl.h"
 
 fgl_vec3_t closest_point_on_line_segment(fgl_vec3_t a, fgl_vec3_t b, fgl_vec3_t p);
 
