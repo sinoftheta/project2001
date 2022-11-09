@@ -24,7 +24,6 @@ fgl files attained from: https://github.com/mhfan/fgl
 
 todo: rename fgl to fix_vec3 or something its sufficently different at this point imo
 
-**DUMBASS ALERT DUMBASS ALERT GOTTA USE EXTERN "C" WITH C FILES**
 
 3d course grain collision notes:
 
@@ -33,10 +32,6 @@ active hitboxes only look for opponent tangable hurtboxes
 search list-> bounding box?
 
 flatten to 2d AABB based on bone position + largest bone radius?
-
-
-need a menu system:
-https://github.com/RobLoach/raylib-nuklear
 
 
 need a multiplayer connect screen with these fields:
@@ -55,14 +50,13 @@ opponent ip
 
 https://stackoverflow.com/questions/48554758/why-create-an-include-directory-in-c-and-c-projects
 
-TODO: get rid of src/include, make fgl_vec3 into its own library (Fix16Vec3) and put it in lib/Fix16Vec3. It may turn into its own library one day or I may push it upstream to libfixmath (prob after quaternions & the skeleton stuff)
-
 
 TODO: need to namespace stuff, but want to keep as much as possible in c for simplicity?
 
 
-next steps:
-1. [ ] add https://github.com/RobLoach/raylib-nuklear to project
+## Next Steps ##
+
+1. [x] add imgui to project
 2. [ ] create main menu scene (state update + render)
 3. [ ] create ggpo info scene (state update + render)
     - use nk_input_glyph as text box
