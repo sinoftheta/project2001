@@ -52,7 +52,7 @@ https://stackoverflow.com/questions/48554758/why-create-an-include-directory-in-
 
 
 TODO: need to namespace stuff, but want to keep as much as possible in c for simplicity?
-
+TODO: look into making a complation database so you can have goto definition and stuff in your editor: https://www.jetbrains.com/help/fleet/generating-a-json-compilation-database.html
 
 ## Next Steps ##
 
